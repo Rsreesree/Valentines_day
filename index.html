@@ -318,10 +318,14 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music - FIXED: Removed autoplay -->
-    <audio id="bgMusic" loop preload="auto">
-        <source src="audio/Oh My Kadavule - Kadhaippoma Song.mp3" type="audio/mpeg">
+    <!-- Background Music (hidden but accessible) -->
+    <!-- Use remote URL first; local file may be blocked on mobile when opened via file:// -->
+    <!-- Added muted attribute for autoplay fallback on mobile -->
+    <audio id="bgMusic" loop preload="auto" playsinline webkit-playsinline="true" x-webkit-airplay="deny" muted style="visibility:hidden;position:absolute;top:0;left:0;width:0;height:0;">
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
+        <!-- fallback to local copy if necessary -->
+        <source src="audio/Oh%20My%20Kadavule%20-%20Kadhaippoma%20Song.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
     </audio>
     
     <!-- Music Control Button -->
@@ -333,7 +337,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            
+            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Music will play when you interact with the page</p>
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -776,32 +780,26 @@
     <script>
         // Music Control Variables
         let musicPlaying = false;
-        let musicStarted = false; // FIXED: Track if music has been started
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('music-toggle');
         
         // Store marriage date globally
         let savedMarriageDate = null;
         
-        // FIXED: Toggle Music Function with mobile support
+        // Toggle Music Function
         function toggleMusic() {
             if (musicPlaying) {
                 bgMusic.pause();
                 musicToggle.innerHTML = '🔇';
                 musicPlaying = false;
             } else {
-                // FIXED: Use Promise-based handling for mobile
-                bgMusic.play().then(() => {
-                    musicToggle.innerHTML = '🔊';
-                    musicPlaying = true;
-                    musicStarted = true;
-                }).catch(e => {
-                    console.log('Music play failed:', e);
-                });
+                bgMusic.play().catch(e => console.log('Music play failed:', e));
+                musicToggle.innerHTML = '🔊';
+                musicPlaying = true;
             }
         }
         
-        // FIXED: Show "Are You Ready?" Prompt with async music
+        // Show "Are You Ready?" Prompt
         function showReadyPrompt() {
             // Preload the music immediately
             bgMusic.load();
@@ -858,20 +856,28 @@
             overlay.appendChild(promptBox);
             document.body.appendChild(overlay);
             
-            // FIXED: Click handler with async music
-            document.getElementById('ready-btn').addEventListener('click', async function() {
-                // Try to start music immediately on user interaction
-                try {
-                    await bgMusic.play();
-                    musicToggle.innerHTML = '🔊';
-                    musicPlaying = true;
-                    musicStarted = true;
-                    console.log('Music started successfully on mobile!');
-                } catch (e) {
-                    console.log('Music play blocked:', e);
+            // Add click handler to ready button
+            document.getElementById('ready-btn').addEventListener('click', function() {
+                // Unmute and ensure audio plays
+                bgMusic.muted = false;
+                const playPromise = bgMusic.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        musicToggle.innerHTML = '🔊';
+                        musicPlaying = true;
+                        console.log('Music started from ready button!');
+                    }).catch(e => {
+                        console.log('Ready button play error:', e);
+                        // If play fails, try again after tiny delay
+                        setTimeout(() => {
+                            bgMusic.muted = true;
+                            bgMusic.play().catch(e2 => console.log('Fallback muted play failed:', e2));
+                        }, 50);
+                    });
                 }
                 
-                // Remove overlay
+                // Remove overlay immediately (no delay)
                 overlay.style.animation = 'fadeOut 0.3s ease';
                 setTimeout(() => {
                     overlay.remove();
@@ -879,26 +885,47 @@
             });
         }
         
-        // Show prompt when page loads
+        // Show prompt when page loads and preload music
         window.addEventListener('load', function() {
-            bgMusic.load();
+            // Try autoplay immediately (will be muted on some platforms)
+            setTimeout(() => {
+                bgMusic.muted = true;
+                bgMusic.play().catch(e => console.log('Initial autoplay blocked:', e));
+            }, 100);
+            
             setTimeout(showReadyPrompt, 300);
         });
-
-        // FIXED: NEW Fallback - tries to play on any click if not started yet
-        document.addEventListener('click', async function() {
-            if (!musicStarted && bgMusic.paused) {
-                try {
-                    await bgMusic.play();
+        
+        // Global audio starter function - works with any interaction
+        function startAudioWithUnmute() {
+            if (bgMusic.paused) {
+                bgMusic.muted = false;
+                bgMusic.play().then(() => {
                     musicToggle.innerHTML = '🔊';
                     musicPlaying = true;
-                    musicStarted = true;
-                    console.log('Music started on user interaction');
-                } catch (e) {
-                    // Silent fail - will try again on next click
-                }
+                    console.log('Audio playing with unmute');
+                }).catch(e => {
+                    console.log('Play failed:', e);
+                    // Retry with muted first
+                    bgMusic.muted = true;
+                    bgMusic.play().catch(e2 => console.log('Even muted play failed:', e2));
+                });
+            } else {
+                // Already playing, just unmute
+                bgMusic.muted = false;
+                musicToggle.innerHTML = '🔊';
+                musicPlaying = true;
             }
-        });
+            // Remove all listeners after first successful interaction
+            document.removeEventListener('touchstart', startAudioWithUnmute);
+            document.removeEventListener('click', startAudioWithUnmute);
+            document.removeEventListener('keydown', startAudioWithUnmute);
+        }
+        
+        // Attach listeners for any user interaction to unmute
+        document.addEventListener('touchstart', startAudioWithUnmute, {passive: true});
+        document.addEventListener('click', startAudioWithUnmute, {passive: true});
+        document.addEventListener('keydown', startAudioWithUnmute, {passive: true});
 
         // Create floating hearts background
         function createFloatingHearts() {
