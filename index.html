@@ -318,10 +318,12 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music (hidden element) -->
-    <audio id="bgMusic" loop preload="auto" controls style="position:absolute;left:-9999px;width:0;height:0;overflow:hidden;">
-        <source src="audio/Oh%20My%20Kadavule%20-%20Kadhaippoma%20Song.mp3" type="audio/mpeg">
+    <!-- Background Music (hidden but accessible) -->
+    <!-- Use remote URL first; local file may be blocked on mobile when opened via file:// -->
+    <audio id="bgMusic" loop preload="auto" playsinline style="visibility:hidden;position:absolute;top:0;left:0;width:0;height:0;">
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
+        <!-- fallback to local copy if necessary -->
+        <source src="audio/Oh%20My%20Kadavule%20-%20Kadhaippoma%20Song.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
     
@@ -334,7 +336,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            
+            <p style="font-size:0.9rem;color:#888;margin-top:10px;">Tap anywhere or press "I'm Ready" to start the music 🎶</p>
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -891,6 +893,9 @@
                         console.log('Music started on user interaction');
                     }).catch(e => {
                         console.log('interaction play failed:', e);
+                        // try again on next touch
+                        document.body.addEventListener('touchstart', startAudioOnInteraction, {once: true});
+                        document.body.addEventListener('click', startAudioOnInteraction, {once: true});
                     });
                 }
                 document.body.removeEventListener('touchstart', startAudioOnInteraction);
