@@ -318,11 +318,9 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music (optimized for mobile) -->
-    <audio id="bgMusic" loop playsinline webkit-playsinline="true" x-webkit-airplay="deny" muted crossorigin="anonymous" style="visibility:hidden;position:absolute;top:0;left:0;width:0;height:0;">
-        <!-- Local file first -->
-        <source src="audio/Oh%20My%20Kadavule%20-%20Kadhaippoma%20Song.mp3" type="audio/mpeg">
-        <!-- Remote fallback -->
+    <!-- Background Music (remote only for maximum compatibility) -->
+    <audio id="bgMusic" loop playsinline webkit-playsinline="true" x-webkit-airplay="deny" crossorigin="anonymous">
+        <!-- Use proven remote URL only -->
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -777,27 +775,6 @@
     </div>
 
     <script>
-        // Aggressive audio initialization for mobile
-        (function initAudio() {
-            const bgMusic = document.getElementById('bgMusic');
-            if (!bgMusic) return;
-            
-            // Try to preload immediately
-            bgMusic.load();
-            
-            // Attempt muted autoplay as soon as DOM is ready
-            setTimeout(() => {
-                bgMusic.muted = true;
-                bgMusic.currentTime = 0;
-                
-                bgMusic.play().catch(err => {
-                    console.log('Muted autoplay blocked:', err.message);
-                });
-            }, 50);
-        })();
-    </script>
-
-    <script>
         // Music Control Variables
         let musicPlaying = false;
         const bgMusic = document.getElementById('bgMusic');
@@ -880,21 +857,18 @@
             document.getElementById('ready-btn').addEventListener('click', function(e) {
                 e.stopPropagation();
                 
-                // Force unmute
-                bgMusic.muted = false;
-                
-                // Ensure play
+                // Play audio
                 const playPromise = bgMusic.play();
-                if (playPromise) {
-                    playPromise.then(() => {
-                        musicToggle.innerHTML = '🔊';
-                        musicPlaying = true;
-                        console.log('✓ Audio started from ready button');
-                    }).catch(e => {
-                        console.log('Ready button error, trying muted:', e?.message);
-                        bgMusic.muted = true;
-                        bgMusic.play().catch(e2 => console.log('Muted fallback failed:', e2?.message));
-                    });
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            musicToggle.innerHTML = '🔊';
+                            musicPlaying = true;
+                            console.log('✓ Audio started from ready button');
+                        })
+                        .catch(err => {
+                            console.log('Ready button play error:', err?.message || err);
+                        });
                 }
                 
                 // Remove overlay
@@ -905,54 +879,33 @@
             });
         }
         
-        // Show prompt when page loads and preload music
+        // Show prompt when page loads
         window.addEventListener('load', function() {
-            // Ensure audio is loaded and muted play is started
-            setTimeout(() => {
-                bgMusic.muted = true;
-                bgMusic.play().catch(e => console.log('Load event muted play:', e?.message));
-            }, 100);
-            
             setTimeout(showReadyPrompt, 300);
         });
         
-        // **CRITICAL**: Unmute on ANY user interaction
-        function unmuteAudio() {
-            try {
-                if (bgMusic.muted) {
-                    bgMusic.muted = false;
-                    
-                    // If it's not playing, start it
-                    if (bgMusic.paused) {
-                        bgMusic.play().catch(err => {
-                            console.log('Unmute play failed:', err?.message);
-                            // Force muted play as last resort
-                            bgMusic.muted = true;
-                            bgMusic.play().catch(e2 => console.log('Last resort failed:', e2?.message));
+        // **SIMPLE**: Play audio on ANY user interaction
+        function playAudioOnInteraction() {
+            if (bgMusic.paused) {
+                const playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            musicToggle.innerHTML = '🔊';
+                            musicPlaying = true;
+                            console.log('✓ Audio is playing');
+                        })
+                        .catch(err => {
+                            console.log('Play error:', err?.message || err);
                         });
-                    }
-                    
-                    musicToggle.innerHTML = '🔊';
-                    musicPlaying = true;
-                    console.log('✓ Audio unmuted and playing');
                 }
-            } catch (err) {
-                console.log('Unmute error:', err?.message);
             }
         }
         
-        // Attach to EVERY possible interaction
-        const interactionEvents = ['touchstart', 'touchend', 'click', 'keydown', 'mousedown', 'focus'];
-        interactionEvents.forEach(event => {
-            document.addEventListener(event, unmuteAudio, {passive: true, once: false});
-        });
-        
-        // Also unmute on ready button click
-        document.addEventListener('DOMContentLoaded', () => {
-            const readyBtn = document.getElementById('ready-btn');
-            if (readyBtn) {
-                readyBtn.addEventListener('click', unmuteAudio, {passive: false});
-            }
+        // Attach to ALL interactions
+        const events = ['touchstart', 'click', 'keydown', 'mousedown'];
+        events.forEach(e => {
+            document.addEventListener(e, playAudioOnInteraction, {passive: true});
         });
 
         // Create floating hearts background
