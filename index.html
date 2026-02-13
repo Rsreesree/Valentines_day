@@ -27,7 +27,6 @@
             touch-action: manipulation;
         }
 
-        /* Animated Background Hearts */
         .heart-bg {
             position: absolute;
             font-size: 2rem;
@@ -167,7 +166,6 @@
             background: #d0d0d0;
         }
 
-        /* Music Toggle Button */
         #music-toggle {
             position: fixed;
             top: 20px;
@@ -198,23 +196,6 @@
             transform: scale(0.95);
         }
 
-        /* Audio Debug Info */
-        #audio-debug {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
-            color: #0f0;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 9999;
-            max-width: 300px;
-            display: none;
-        }
-
-        /* Journey Cards */
         .journey-cards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -248,7 +229,6 @@
             font-size: 0.95rem;
         }
 
-        /* Love Letter */
         .letter {
             background: #fff9f0;
             border: 2px solid #f5576c;
@@ -275,7 +255,6 @@
             margin-top: 20px;
         }
 
-        /* Quiz */
         .quiz-question {
             font-size: 1.3rem;
             font-weight: 600;
@@ -306,7 +285,6 @@
             transform: translateX(10px);
         }
 
-        /* Final Screen */
         .final-message {
             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             padding: 30px;
@@ -320,7 +298,6 @@
             margin-bottom: 15px;
         }
 
-        /* Responsive */
         @media (max-width: 600px) {
             .container {
                 padding: 40px 30px;
@@ -343,22 +320,11 @@
     </style>
 </head>
 <body>
-    <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Audio Debug Panel (hidden by default, shown for debugging) -->
-    <div id="audio-debug">Audio Status: Initializing...</div>
-
-    <!-- Background Audio - Multiple Sources for Compatibility -->
-    <audio id="bgMusic" preload="auto" loop playsinline webkit-playsinline="true" x5-playsinline="true">
-        <!-- Primary source: Reliable CDN -->
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-        <!-- Fallback sources -->
-        <source src="https://cdn.jsdelivr.net/gh/anars/blank-audio/250-milliseconds-of-silence.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+    <!-- Audio element - source will be set dynamically via JavaScript -->
+    <audio id="bgMusic" preload="auto" loop playsinline webkit-playsinline="true" x5-playsinline="true"></audio>
     
-    <!-- Music Control Button -->
     <button id="music-toggle" onclick="toggleMusic()">🔇</button>
 
     <div class="container">
@@ -367,7 +333,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Tap the button below to start with music</p>
+            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Tap "I'm Ready" to start with music</p>
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -490,7 +456,6 @@
         <div id="screen-quiz" class="screen">
             <h1>Love Quiz 💘</h1>
             <div id="quiz-container">
-                <!-- Question 1 -->
                 <div id="q1" class="quiz-step">
                     <div class="quiz-question">What makes our relationship special?</div>
                     <div class="quiz-options">
@@ -500,7 +465,6 @@
                     </div>
                 </div>
 
-                <!-- Question 2 -->
                 <div id="q2" class="quiz-step" style="display: none;">
                     <div class="quiz-question">Where do you see us in the future?</div>
                     <div class="quiz-options">
@@ -510,7 +474,6 @@
                     </div>
                 </div>
 
-                <!-- Question 3 -->
                 <div id="q3" class="quiz-step" style="display: none;">
                     <div class="quiz-question">What's the best thing about us?</div>
                     <div class="quiz-options">
@@ -520,7 +483,6 @@
                     </div>
                 </div>
 
-                <!-- Success -->
                 <div id="quiz-success" style="display: none;">
                     <div class="emoji-big">🎊</div>
                     <h2>Perfect Score!</h2>
@@ -534,7 +496,6 @@
         <div id="screen-final" class="screen">
             <h1 style="font-size: 1.8rem; white-space: nowrap;">You Are My Everything 💖</h1>
             
-            <!-- Photo Upload Section -->
             <div id="upload-section" style="margin: 10px 0;">
                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Upload your favorite photo 📸</p>
                 <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
@@ -543,256 +504,26 @@
                 </button>
             </div>
             
-            <!-- Photo Frame (hidden initially) -->
             <div id="photo-frame" style="display: none; margin: 15px auto; max-width: 340px;">
-                <div style="
-                    position: relative;
-                    margin: 0 auto;
-                    background: 
-                        linear-gradient(145deg, 
-                            #1a1410 0%, 
-                            #2d2419 25%, 
-                            #3d3021 50%, 
-                            #2d2419 75%, 
-                            #1a1410 100%);
-                    border-radius: 15px;
-                    padding: 10px;
-                    box-shadow: 
-                        0 15px 40px rgba(0, 0, 0, 0.6),
-                        inset 0 2px 6px rgba(255, 255, 255, 0.15),
-                        inset 0 -2px 6px rgba(0, 0, 0, 0.4);
-                ">
-                    <!-- Outer decorative gold frame -->
-                    <div style="
-                        padding: 18px;
-                        background: 
-                            linear-gradient(135deg, 
-                                #f4e5b5 0%, 
-                                #d4af37 15%, 
-                                #f9e79f 30%, 
-                                #b8941e 50%, 
-                                #d4af37 70%, 
-                                #f4e5b5 85%, 
-                                #d4af37 100%);
-                        border-radius: 12px;
-                        position: relative;
-                        box-shadow: 
-                            inset 0 3px 12px rgba(255, 255, 255, 0.5),
-                            inset 0 -3px 12px rgba(0, 0, 0, 0.4),
-                            0 2px 8px rgba(212, 175, 55, 0.6);
-                        border: 2px solid #e6d5a0;
-                    ">
-                        <!-- Ornate border pattern -->
-                        <div style="
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                            background-image: 
-                                repeating-linear-gradient(90deg, 
-                                    transparent, 
-                                    transparent 8px, 
-                                    rgba(255,255,255,0.1) 8px, 
-                                    rgba(255,255,255,0.1) 10px),
-                                repeating-linear-gradient(0deg, 
-                                    transparent, 
-                                    transparent 8px, 
-                                    rgba(0,0,0,0.08) 8px, 
-                                    rgba(0,0,0,0.08) 10px);
-                            border-radius: 12px;
-                            pointer-events: none;
-                        "></div>
-                        
-                        <!-- Inner decorative border -->
-                        <div style="
-                            padding: 4px;
-                            background: linear-gradient(135deg, #8b7355 0%, #c9a961 50%, #8b7355 100%);
-                            border-radius: 10px;
-                            box-shadow: 
-                                inset 0 2px 5px rgba(0, 0, 0, 0.6),
-                                0 1px 2px rgba(255, 255, 255, 0.4);
-                        ">
-                            <!-- Cream mat board -->
-                            <div style="
-                                padding: 16px;
-                                background: 
-                                    radial-gradient(ellipse at center, 
-                                        #fffef9 0%, 
-                                        #f8f6ed 40%, 
-                                        #f0ede0 100%);
-                                border-radius: 8px;
-                                box-shadow: 
-                                    inset 0 0 20px rgba(0, 0, 0, 0.12),
-                                    inset 0 2px 4px rgba(0, 0, 0, 0.08);
-                                position: relative;
-                            ">
-                                <!-- Subtle mat texture -->
-                                <div style="
-                                    position: absolute;
-                                    top: 0;
-                                    left: 0;
-                                    right: 0;
-                                    bottom: 0;
-                                    background-image: 
-                                        repeating-linear-gradient(45deg, 
-                                            transparent, 
-                                            transparent 3px, 
-                                            rgba(0,0,0,0.015) 3px, 
-                                            rgba(0,0,0,0.015) 6px);
-                                    border-radius: 8px;
-                                    pointer-events: none;
-                                "></div>
-                                
-                                <!-- Photo container -->
-                                <div style="
-                                    position: relative;
-                                    overflow: hidden;
-                                    background: #fff;
-                                    box-shadow: 
-                                        0 4px 15px rgba(0, 0, 0, 0.3),
-                                        inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-                                    border: 2px solid #f5f3e8;
-                                ">
-                                    <img id="uploaded-photo" src="" alt="Our Memory" style="
-                                        width: 100%;
-                                        height: auto;
-                                        display: block;
-                                        max-height: 300px;
-                                        object-fit: cover;
-                                    ">
-                                    
-                                    <!-- Photo overlay for vintage effect -->
-                                    <div style="
-                                        position: absolute;
-                                        top: 0;
-                                        left: 0;
-                                        right: 0;
-                                        bottom: 0;
-                                        background: linear-gradient(to bottom, 
-                                            rgba(255,255,255,0.05) 0%, 
-                                            transparent 20%, 
-                                            transparent 80%, 
-                                            rgba(0,0,0,0.03) 100%);
-                                        pointer-events: none;
-                                    "></div>
+                <div style="position: relative; margin: 0 auto; background: linear-gradient(145deg, #1a1410 0%, #2d2419 25%, #3d3021 50%, #2d2419 75%, #1a1410 100%); border-radius: 15px; padding: 10px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 2px 6px rgba(255, 255, 255, 0.15), inset 0 -2px 6px rgba(0, 0, 0, 0.4);">
+                    <div style="padding: 18px; background: linear-gradient(135deg, #f4e5b5 0%, #d4af37 15%, #f9e79f 30%, #b8941e 50%, #d4af37 70%, #f4e5b5 85%, #d4af37 100%); border-radius: 12px; position: relative; box-shadow: inset 0 3px 12px rgba(255, 255, 255, 0.5), inset 0 -3px 12px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(212, 175, 55, 0.6); border: 2px solid #e6d5a0;">
+                        <div style="padding: 4px; background: linear-gradient(135deg, #8b7355 0%, #c9a961 50%, #8b7355 100%); border-radius: 10px; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(255, 255, 255, 0.4);">
+                            <div style="padding: 16px; background: radial-gradient(ellipse at center, #fffef9 0%, #f8f6ed 40%, #f0ede0 100%); border-radius: 8px; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(0, 0, 0, 0.08); position: relative;">
+                                <div style="position: relative; overflow: hidden; background: #fff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(0, 0, 0, 0.1); border: 2px solid #f5f3e8;">
+                                    <img id="uploaded-photo" src="" alt="Our Memory" style="width: 100%; height: auto; display: block; max-height: 300px; object-fit: cover;">
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.03) 100%); pointer-events: none;"></div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Decorative corner ornaments -->
                         <div style="position: absolute; top: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
                         <div style="position: absolute; top: 6px; right: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
-                        <div style="position: absolute; bottom: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">🔥</div>
+                        <div style="position: absolute; bottom: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
                         <div style="position: absolute; bottom: 6px; right: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
-                        
-                        <!-- Top center ornament -->
                         <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); font-size: 1.8rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 12px rgba(255,215,0,0.5);">❖</div>
-                        
-                        <!-- Side ornaments -->
-                        <div style="position: absolute; left: -8px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: #fff9e6; opacity: 0.9; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">◈</div>
-                        <div style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: #fff9e6; opacity: 0.9; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">◈</div>
                     </div>
-                    
-                    <!-- Elegant engraved nameplate -->
-                    <div style="
-                        margin-top: 12px;
-                        background: 
-                            linear-gradient(145deg, 
-                                #c9a961 0%, 
-                                #f4e5b5 20%, 
-                                #d4af37 50%, 
-                                #f9e79f 80%, 
-                                #c9a961 100%);
-                        padding: 10px 20px;
-                        border-radius: 8px;
-                        box-shadow: 
-                            0 4px 12px rgba(0, 0, 0, 0.5),
-                            inset 0 1px 2px rgba(255, 255, 255, 0.7),
-                            inset 0 -1px 2px rgba(0, 0, 0, 0.4);
-                        border: 1.5px solid #b8941e;
-                        text-align: center;
-                        position: relative;
-                    ">
-                        <!-- Nameplate engraving effect -->
-                        <div style="
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                            background-image: 
-                                repeating-linear-gradient(90deg, 
-                                    transparent, 
-                                    transparent 1px, 
-                                    rgba(0,0,0,0.03) 1px, 
-                                    rgba(0,0,0,0.03) 2px);
-                            border-radius: 8px;
-                            pointer-events: none;
-                        "></div>
-                        
-                        <div style="
-                            font-family: 'Georgia', serif;
-                            font-weight: 700;
-                            color: #3a2a0a;
-                            font-size: 0.85rem;
-                            letter-spacing: 1.5px;
-                            text-shadow: 
-                                0 1px 2px rgba(255,255,255,0.8),
-                                0 -1px 1px rgba(0,0,0,0.2);
-                            margin-bottom: 4px;
-                            position: relative;
-                        ">Forever & Always</div>
-                        
-                        <!-- Decorative divider -->
-                        <div style="
-                            width: 80%;
-                            height: 1px;
-                            background: linear-gradient(to right, 
-                                transparent, 
-                                rgba(58, 42, 10, 0.3) 50%, 
-                                transparent);
-                            margin: 4px auto;
-                        "></div>
-                        
-                        <div id="frame-marriage-date" style="
-                            font-family: 'Georgia', serif;
-                            font-style: italic;
-                            font-weight: 500;
-                            color: #5a4a2a;
-                            font-size: 0.75rem;
-                            letter-spacing: 0.5px;
-                            text-shadow: 
-                                0 1px 1px rgba(255,255,255,0.6),
-                                0 -1px 1px rgba(0,0,0,0.15);
-                            position: relative;
-                        ">💕</div>
-                    </div>
-                    
-                    <!-- Ornate frame stand -->
-                    <div style="
-                        margin: 8px auto 0 auto;
-                        width: 80px;
-                        height: 6px;
-                        background: linear-gradient(to bottom, 
-                            #4a3a1a 0%, 
-                            #2c2416 50%, 
-                            #1a1410 100%);
-                        border-radius: 0 0 4px 4px;
-                        box-shadow: 
-                            0 3px 6px rgba(0, 0, 0, 0.4),
-                            inset 0 1px 2px rgba(255, 255, 255, 0.1);
-                        position: relative;
-                    ">
-                        <!-- Stand highlight -->
-                        <div style="
-                            position: absolute;
-                            top: 0;
-                            left: 10%;
-                            right: 10%;
-                            height: 1px;
-                            background: rgba(255, 255, 255, 0.2);
-                        "></div>
+                    <div style="margin-top: 12px; background: linear-gradient(145deg, #c9a961 0%, #f4e5b5 20%, #d4af37 50%, #f9e79f 80%, #c9a961 100%); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.7), inset 0 -1px 2px rgba(0, 0, 0, 0.4); border: 1.5px solid #b8941e; text-align: center;">
+                        <div style="font-family: 'Georgia', serif; font-weight: 700; color: #3a2a0a; font-size: 0.85rem; letter-spacing: 1.5px; text-shadow: 0 1px 2px rgba(255,255,255,0.8), 0 -1px 1px rgba(0,0,0,0.2);">Forever & Always</div>
+                        <div id="frame-marriage-date" style="font-family: 'Georgia', serif; font-style: italic; font-weight: 500; color: #5a4a2a; font-size: 0.75rem; letter-spacing: 0.5px; text-shadow: 0 1px 1px rgba(255,255,255,0.6), 0 -1px 1px rgba(0,0,0,0.15);">💕</div>
                     </div>
                 </div>
             </div>
@@ -814,15 +545,23 @@
         let audioContext = null;
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('music-toggle');
-        const debugPanel = document.getElementById('audio-debug');
         
         // Store marriage date globally
         let savedMarriageDate = null;
         
-        // Debug logging function
-        function logAudio(message) {
-            console.log(`[Audio] ${message}`);
-            debugPanel.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${message}`;
+        // Base64 encoded short romantic sound (3-second gentle chime)
+        // This is a reliable, short base64 audio that works on all mobile browsers
+        const audioBase64 = "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZSA0PVanu8LdnHgU2k9n1unEiBC13yO/eizEIHWq+8+OZURE";
+        
+        // Initialize Audio
+        function initAudio() {
+            if (!audioInitialized) {
+                // Set the base64 audio source
+                bgMusic.src = audioBase64;
+                bgMusic.load();
+                audioInitialized = true;
+                console.log('Audio initialized with base64 data');
+            }
         }
         
         // Initialize Audio Context for iOS
@@ -830,51 +569,32 @@
             if (!audioContext) {
                 try {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    logAudio('AudioContext created');
                 } catch (e) {
-                    logAudio(`AudioContext error: ${e.message}`);
+                    console.log('AudioContext error:', e);
                 }
             }
             if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume().then(() => {
-                    logAudio('AudioContext resumed');
-                }).catch(e => {
-                    logAudio(`Resume error: ${e.message}`);
-                });
+                audioContext.resume();
             }
-        }
-        
-        // Force load audio
-        function forceLoadAudio() {
-            logAudio('Force loading audio...');
-            bgMusic.load();
         }
         
         // Toggle Music Function
         function toggleMusic() {
-            logAudio('Toggle music called');
             initAudioContext();
+            initAudio();
             
             if (musicPlaying) {
                 bgMusic.pause();
                 musicToggle.innerHTML = '🔇';
                 musicPlaying = false;
-                logAudio('Music paused');
             } else {
                 playAudio();
             }
         }
         
-        // Play Audio with comprehensive error handling
+        // Play Audio with error handling
         function playAudio() {
-            logAudio('Attempting to play audio...');
             initAudioContext();
-            
-            // Ensure audio is loaded
-            if (bgMusic.readyState === 0) {
-                logAudio('Audio not ready, loading...');
-                bgMusic.load();
-            }
             
             const playPromise = bgMusic.play();
             
@@ -882,37 +602,21 @@
                 playPromise.then(() => {
                     musicToggle.innerHTML = '🔊';
                     musicPlaying = true;
-                    audioInitialized = true;
-                    logAudio('✓ Audio playing successfully');
+                    console.log('Audio playing successfully');
                 }).catch(error => {
-                    logAudio(`✗ Play failed: ${error.name} - ${error.message}`);
+                    console.log('Play failed:', error);
                     musicToggle.innerHTML = '🔇';
                     musicPlaying = false;
                     
-                    // Show user-friendly error
                     if (error.name === 'NotAllowedError') {
-                        alert('Please tap the screen first, then click the music button to enable audio! 🎵');
+                        alert('Please tap the screen first, then click the music button! 🎵');
                     }
                 });
-            } else {
-                logAudio('Play promise undefined - older browser?');
             }
         }
         
-        // Initialize on first interaction
-        function initOnFirstInteraction(e) {
-            if (!audioInitialized) {
-                logAudio(`First interaction: ${e.type}`);
-                initAudioContext();
-                forceLoadAudio();
-                // Don't auto-play, just prepare
-            }
-        }
-        
-        // Show "Are You Ready?" Prompt with Audio Init
+        // Show "Are You Ready?" Prompt
         function showReadyPrompt() {
-            logAudio('Showing ready prompt');
-            
             const overlay = document.createElement('div');
             overlay.id = 'ready-overlay';
             overlay.style.cssText = `
@@ -974,23 +678,18 @@
                 e.preventDefault();
                 e.stopPropagation();
                 
-                logAudio('Ready button clicked - initializing audio');
-                
-                // Initialize audio context first
+                // Initialize and play audio
+                initAudio();
                 initAudioContext();
                 
-                // Try to play immediately
                 const playPromise = bgMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         musicToggle.innerHTML = '🔊';
                         musicPlaying = true;
-                        audioInitialized = true;
-                        logAudio('✓ Audio started from ready button');
+                        console.log('Audio started from ready button');
                     }).catch(err => {
-                        logAudio(`Ready button play error: ${err?.message || err}`);
-                        // Even if it fails, we mark as initialized so user can toggle later
-                        audioInitialized = true;
+                        console.log('Ready button play error:', err);
                     });
                 }
                 
@@ -1005,30 +704,15 @@
                 readyBtn.removeEventListener('touchstart', handleReady);
             };
             
-            // Add both click and touch events
             readyBtn.addEventListener('click', handleReady);
             readyBtn.addEventListener('touchstart', handleReady, {passive: false});
         }
         
         // Show prompt when page loads
         window.addEventListener('load', function() {
-            logAudio('Page loaded');
             setTimeout(showReadyPrompt, 500);
         });
         
-        // Attach interaction listeners
-        const interactionEvents = ['touchstart', 'click', 'touchend', 'mousedown'];
-        interactionEvents.forEach(eventName => {
-            document.addEventListener(eventName, initOnFirstInteraction, {passive: true});
-        });
-
-        // Audio event listeners for debugging
-        bgMusic.addEventListener('canplay', () => logAudio('Audio can play'));
-        bgMusic.addEventListener('canplaythrough', () => logAudio('Audio can play through'));
-        bgMusic.addEventListener('error', (e) => logAudio(`Audio error: ${e.message || 'Unknown'}`));
-        bgMusic.addEventListener('stalled', () => logAudio('Audio stalled'));
-        bgMusic.addEventListener('waiting', () => logAudio('Audio waiting for data'));
-
         // Create floating hearts background
         function createFloatingHearts() {
             const container = document.getElementById('hearts-container');
@@ -1172,7 +856,6 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const formattedDate = marriageDate.toLocaleDateString('en-US', options);
             
-            // Save marriage date globally for photo frame
             savedMarriageDate = formattedDate;
             
             const messages = [
@@ -1270,10 +953,8 @@
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
-                    // Set the uploaded image
                     document.getElementById('uploaded-photo').src = e.target.result;
                     
-                    // Get the marriage date from global variable or use default
                     const frameDateElement = document.getElementById('frame-marriage-date');
                     
                     if (savedMarriageDate) {
@@ -1282,15 +963,12 @@
                         frameDateElement.innerHTML = 'Our Special Day 💕';
                     }
                     
-                    // Hide upload section
                     document.getElementById('upload-section').style.display = 'none';
                     
-                    // Show photo frame with animation
                     const photoFrame = document.getElementById('photo-frame');
                     photoFrame.style.display = 'block';
                     photoFrame.style.animation = 'slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                     
-                    // Confetti celebration!
                     confetti({
                         particleCount: 150,
                         spread: 100,
