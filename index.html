@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Will You Be My Valentine? 💕</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -23,6 +24,7 @@
             align-items: center;
             overflow: hidden;
             position: relative;
+            touch-action: manipulation;
         }
 
         /* Animated Background Hearts */
@@ -32,6 +34,7 @@
             opacity: 0.15;
             animation: floatHeart 15s infinite ease-in-out;
             pointer-events: none;
+            will-change: transform;
         }
 
         @keyframes floatHeart {
@@ -64,6 +67,7 @@
         .container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 30px;
             padding: 60px 50px;
             max-width: 550px;
@@ -114,6 +118,7 @@
             font-size: 6rem;
             margin: 20px 0;
             animation: pulse 2s infinite;
+            will-change: transform;
         }
 
         @keyframes pulse {
@@ -139,6 +144,8 @@
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             font-family: 'Poppins', sans-serif;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            -webkit-appearance: none;
+            touch-action: manipulation;
         }
 
         #yes-btn {
@@ -178,6 +185,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-appearance: none;
+            touch-action: manipulation;
         }
 
         #music-toggle:hover {
@@ -204,6 +213,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            touch-action: manipulation;
         }
 
         .card:hover {
@@ -233,6 +243,7 @@
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
             max-height: 400px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .letter p {
@@ -270,6 +281,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
+            touch-action: manipulation;
         }
 
         .quiz-option:hover {
@@ -318,9 +330,8 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music (remote only for maximum compatibility) -->
-    <audio id="bgMusic" loop playsinline webkit-playsinline="true" x-webkit-airplay="deny" crossorigin="anonymous">
-        <!-- Use proven remote URL only -->
+    <!-- Background Audio - Fixed for Mobile -->
+    <audio id="bgMusic" preload="auto" loop playsinline webkit-playsinline="true" x5-playsinline="true" x-webkit-airplay="deny">
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
     </audio>
@@ -334,7 +345,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Music will play when you interact with the page</p>
+            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Tap anywhere to enable music</p>
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -775,32 +786,70 @@
     </div>
 
     <script>
-        // Music Control Variables
+        // Audio Context and Music Control
         let musicPlaying = false;
+        let audioContext = null;
+        let audioInitialized = false;
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('music-toggle');
         
         // Store marriage date globally
         let savedMarriageDate = null;
         
-        // Toggle Music Function
+        // Initialize Audio Context for iOS
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+        
+        // Toggle Music Function - Fixed for Mobile
         function toggleMusic() {
+            initAudioContext();
+            
             if (musicPlaying) {
                 bgMusic.pause();
                 musicToggle.innerHTML = '🔇';
                 musicPlaying = false;
             } else {
-                bgMusic.play().catch(e => console.log('Music play failed:', e));
-                musicToggle.innerHTML = '🔊';
-                musicPlaying = true;
+                playAudio();
+            }
+        }
+        
+        // Play Audio with Error Handling
+        function playAudio() {
+            initAudioContext();
+            
+            const playPromise = bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    musicToggle.innerHTML = '🔊';
+                    musicPlaying = true;
+                    audioInitialized = true;
+                    console.log('Audio playing successfully');
+                }).catch(error => {
+                    console.log('Audio play failed:', error);
+                    // Try again after user interaction
+                    musicToggle.innerHTML = '🔇';
+                    musicPlaying = false;
+                });
+            }
+        }
+        
+        // Initialize Audio on First User Interaction
+        function initAudioOnFirstInteraction() {
+            if (!audioInitialized) {
+                initAudioContext();
+                playAudio();
             }
         }
         
         // Show "Are You Ready?" Prompt
         function showReadyPrompt() {
-            // Preload the music immediately
-            bgMusic.load();
-            
             const overlay = document.createElement('div');
             overlay.id = 'ready-overlay';
             overlay.style.cssText = `
@@ -815,6 +864,7 @@
                 align-items: center;
                 z-index: 99999;
                 animation: fadeIn 0.5s ease;
+                touch-action: manipulation;
             `;
             
             const promptBox = document.createElement('div');
@@ -845,6 +895,8 @@
                     box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
                     transition: all 0.3s ease;
                     font-family: 'Poppins', sans-serif;
+                    -webkit-appearance: none;
+                    touch-action: manipulation;
                 ">
                     I'm Ready! 💖
                 </button>
@@ -853,30 +905,30 @@
             overlay.appendChild(promptBox);
             document.body.appendChild(overlay);
             
-            // Add click handler to ready button
-            document.getElementById('ready-btn').addEventListener('click', function(e) {
+            // Handle ready button click
+            const readyBtn = document.getElementById('ready-btn');
+            
+            const handleReady = function(e) {
+                e.preventDefault();
                 e.stopPropagation();
                 
-                // Play audio
-                const playPromise = bgMusic.play();
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
-                            musicToggle.innerHTML = '🔊';
-                            musicPlaying = true;
-                            console.log('✓ Audio started from ready button');
-                        })
-                        .catch(err => {
-                            console.log('Ready button play error:', err?.message || err);
-                        });
-                }
+                // Initialize and play audio
+                initAudioContext();
+                playAudio();
                 
-                // Remove overlay
+                // Remove overlay with animation
                 overlay.style.animation = 'fadeOut 0.3s ease';
                 setTimeout(() => {
                     overlay.remove();
                 }, 300);
-            });
+                
+                // Remove event listeners
+                readyBtn.removeEventListener('click', handleReady);
+                readyBtn.removeEventListener('touchstart', handleReady);
+            };
+            
+            readyBtn.addEventListener('click', handleReady);
+            readyBtn.addEventListener('touchstart', handleReady, {passive: false});
         }
         
         // Show prompt when page loads
@@ -884,28 +936,18 @@
             setTimeout(showReadyPrompt, 300);
         });
         
-        // **SIMPLE**: Play audio on ANY user interaction
-        function playAudioOnInteraction() {
-            if (bgMusic.paused) {
-                const playPromise = bgMusic.play();
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
-                            musicToggle.innerHTML = '🔊';
-                            musicPlaying = true;
-                            console.log('✓ Audio is playing');
-                        })
-                        .catch(err => {
-                            console.log('Play error:', err?.message || err);
-                        });
-                }
-            }
+        // Attach to ALL interactions for mobile compatibility
+        const interactionEvents = ['touchstart', 'click', 'touchend'];
+        
+        function handleInteraction(e) {
+            // Only handle if not clicking the music toggle or ready button
+            if (e.target.id === 'music-toggle' || e.target.id === 'ready-btn') return;
+            
+            initAudioOnFirstInteraction();
         }
         
-        // Attach to ALL interactions
-        const events = ['touchstart', 'click', 'keydown', 'mousedown'];
-        events.forEach(e => {
-            document.addEventListener(e, playAudioOnInteraction, {passive: true});
+        interactionEvents.forEach(eventName => {
+            document.addEventListener(eventName, handleInteraction, {passive: true});
         });
 
         // Create floating hearts background
