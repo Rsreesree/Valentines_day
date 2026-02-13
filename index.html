@@ -318,10 +318,11 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music -->
-    <audio id="bgMusic" loop preload="auto">
-        <source src="audio/Oh My Kadavule - Kadhaippoma Song.mp3" type="audio/mpeg">
+    <!-- Background Music (hidden element) -->
+    <audio id="bgMusic" loop preload="auto" controls style="position:absolute;left:-9999px;width:0;height:0;overflow:hidden;">
+        <source src="audio/Oh%20My%20Kadavule%20-%20Kadhaippoma%20Song.mp3" type="audio/mpeg">
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
     </audio>
     
     <!-- Music Control Button -->
@@ -880,6 +881,23 @@
             // Preload music in background
             bgMusic.load();
             setTimeout(showReadyPrompt, 300);
+
+            // also listen for a first touch/click anywhere on the page to kickstart audio on mobile
+            function startAudioOnInteraction() {
+                if (!musicPlaying) {
+                    bgMusic.play().then(() => {
+                        musicToggle.innerHTML = '🔊';
+                        musicPlaying = true;
+                        console.log('Music started on user interaction');
+                    }).catch(e => {
+                        console.log('interaction play failed:', e);
+                    });
+                }
+                document.body.removeEventListener('touchstart', startAudioOnInteraction);
+                document.body.removeEventListener('click', startAudioOnInteraction);
+            }
+            document.body.addEventListener('touchstart', startAudioOnInteraction, {once: true});
+            document.body.addEventListener('click', startAudioOnInteraction, {once: true});
         });
 
         // Create floating hearts background
