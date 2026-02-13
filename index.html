@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Will You Be My Valentine? 💕</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -12,6 +12,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -23,6 +24,7 @@
             align-items: center;
             overflow: hidden;
             position: relative;
+            touch-action: manipulation;
         }
 
         /* Animated Background Hearts */
@@ -139,6 +141,8 @@
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             font-family: 'Poppins', sans-serif;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            -webkit-appearance: none;
+            touch-action: manipulation;
         }
 
         #yes-btn {
@@ -146,7 +150,7 @@
             color: white;
         }
 
-        #yes-btn:hover {
+        #yes-btn:hover, #yes-btn:active {
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(245, 87, 108, 0.4);
         }
@@ -156,11 +160,11 @@
             color: #666;
         }
 
-        #no-btn:hover {
+        #no-btn:hover, #no-btn:active {
             background: #d0d0d0;
         }
 
-        /* Music Toggle Button */
+        /* Music Toggle Button - Mobile Optimized */
         #music-toggle {
             position: fixed;
             top: 20px;
@@ -175,18 +179,29 @@
             cursor: pointer;
             box-shadow: 0 5px 20px rgba(245, 87, 108, 0.3);
             transition: all 0.3s ease;
-            display: flex;
+            display: none; /* Hidden until audio unlocked */
             align-items: center;
             justify-content: center;
+            -webkit-appearance: none;
+            touch-action: manipulation;
         }
 
-        #music-toggle:hover {
+        #music-toggle.visible {
+            display: flex;
+        }
+
+        #music-toggle:hover, #music-toggle:active {
             transform: scale(1.1) rotate(15deg);
             box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
         }
 
-        #music-toggle:active {
-            transform: scale(0.95);
+        #music-toggle.playing {
+            animation: musicPulse 2s infinite;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         /* Journey Cards */
@@ -204,9 +219,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
         }
 
-        .card:hover {
+        .card:hover, .card:active {
             transform: translateY(-5px) scale(1.03);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
@@ -270,9 +286,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
         }
 
-        .quiz-option:hover {
+        .quiz-option:hover, .quiz-option:active {
             border-color: #f5576c;
             background: #fff0f3;
             transform: translateX(10px);
@@ -290,6 +307,43 @@
             color: #333;
             font-size: 1.8rem;
             margin-bottom: 15px;
+        }
+
+        /* Mobile Audio Start Overlay - CRITICAL FOR ANDROID CHROME */
+        #audio-start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.98) 0%, rgba(118, 75, 162, 0.98) 50%, rgba(240, 147, 251, 0.98) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .start-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive */
@@ -310,6 +364,8 @@
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
+                top: 10px;
+                right: 10px;
             }
         }
     </style>
@@ -318,11 +374,35 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music (remote only for maximum compatibility) -->
-    <audio id="bgMusic" loop preload="auto" playsinline webkit-playsinline="true" x-webkit-airplay="deny" crossorigin="anonymous">
-        <!-- Use proven remote URL only -->
+    <!-- CRITICAL: Audio Start Overlay for Mobile Browsers -->
+    <div id="audio-start-overlay">
+        <div class="start-card">
+            <div style="font-size: 5rem; margin-bottom: 25px; animation: pulse 2s infinite;">💝</div>
+            <h1 style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; margin-bottom: 20px; font-weight: 700;">Tap to Begin</h1>
+            <p style="color: #666; font-size: 1.2rem; margin-bottom: 35px; line-height: 1.6;">Experience this with music 🎵<br>Tap anywhere to start!</p>
+            <button id="start-btn" style="
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                border: none;
+                padding: 20px 60px;
+                font-size: 1.4rem;
+                font-weight: 700;
+                border-radius: 50px;
+                cursor: pointer;
+                box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+                transition: all 0.3s ease;
+                font-family: 'Poppins', sans-serif;
+                -webkit-tap-highlight-color: transparent;
+            ">
+                Start Experience 🎵
+            </button>
+        </div>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" preload="auto" playsinline webkit-playsinline x5-playsinline>
+        <source src="audio/Oh My Kadavule - Kadhaippoma Song.mp3" type="audio/mpeg">
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
     
     <!-- Music Control Button -->
@@ -334,7 +414,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Music will play when you interact with the page</p>
+            
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -777,135 +857,113 @@
     <script>
         // Music Control Variables
         let musicPlaying = false;
+        let audioUnlocked = false;
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('music-toggle');
+        const audioOverlay = document.getElementById('audio-start-overlay');
+        const startBtn = document.getElementById('start-btn');
         
         // Store marriage date globally
         let savedMarriageDate = null;
         
+        // CRITICAL FIX FOR ANDROID CHROME: Audio must be unlocked with direct user gesture
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            
+            console.log('Unlocking audio...');
+            
+            // Set volume before playing
+            bgMusic.volume = 0.7;
+            
+            // CRITICAL: For Android Chrome, we MUST call play() directly in the click handler
+            // No setTimeout, no async operations, no promises that delay execution
+            const playPromise = bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('Audio unlocked successfully');
+                    musicPlaying = true;
+                    audioUnlocked = true;
+                    musicToggle.innerHTML = '🔊';
+                    musicToggle.classList.add('playing');
+                    
+                    // Hide overlay immediately
+                    audioOverlay.style.opacity = '0';
+                    audioOverlay.style.transition = 'opacity 0.5s';
+                    setTimeout(() => {
+                        audioOverlay.style.display = 'none';
+                        musicToggle.classList.add('visible');
+                    }, 500);
+                }).catch(error => {
+                    console.error('Audio unlock failed:', error);
+                    // Even if it fails, we mark as unlocked to prevent retry loops
+                    audioUnlocked = true;
+                    audioOverlay.style.display = 'none';
+                    musicToggle.classList.add('visible');
+                });
+            } else {
+                // Older browsers that don't return promises
+                musicPlaying = true;
+                audioUnlocked = true;
+                musicToggle.innerHTML = '🔊';
+                audioOverlay.style.display = 'none';
+                musicToggle.classList.add('visible');
+            }
+        }
+        
+        // Attach event listeners to the start button - CRITICAL for Android Chrome
+        startBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            unlockAudio();
+        });
+        
+        // Also allow tapping anywhere on the overlay
+        audioOverlay.addEventListener('click', function(e) {
+            if (e.target === audioOverlay || e.target.closest('.start-card')) {
+                unlockAudio();
+            }
+        });
+        
+        // Handle touch events specifically for mobile
+        startBtn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            unlockAudio();
+        });
+        
         // Toggle Music Function
         function toggleMusic() {
+            if (!audioUnlocked) {
+                alert('Please tap "Start Experience" first to enable audio! 🎵');
+                return;
+            }
+            
             if (musicPlaying) {
                 bgMusic.pause();
                 musicToggle.innerHTML = '🔇';
+                musicToggle.classList.remove('playing');
                 musicPlaying = false;
             } else {
-                bgMusic.play().catch(e => console.log('Music play failed:', e));
-                musicToggle.innerHTML = '🔊';
-                musicPlaying = true;
-            }
-        }
-        
-        // Show "Are You Ready?" Prompt
-        function showReadyPrompt() {
-            // Preload the music immediately
-            bgMusic.load();
-            
-            const overlay = document.createElement('div');
-            overlay.id = 'ready-overlay';
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 50%, rgba(240, 147, 251, 0.95) 100%);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 99999;
-                animation: fadeIn 0.5s ease;
-            `;
-            
-            const promptBox = document.createElement('div');
-            promptBox.style.cssText = `
-                background: white;
-                padding: 50px 40px;
-                border-radius: 30px;
-                text-align: center;
-                max-width: 450px;
-                width: 90%;
-                box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-                animation: slideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            `;
-            
-            promptBox.innerHTML = `
-                <div style="font-size: 5rem; margin-bottom: 25px; animation: pulse 2s infinite;">💝</div>
-                <h1 style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; margin-bottom: 20px; font-weight: 700;">Are You Ready?</h1>
-                <p style="color: #666; font-size: 1.2rem; margin-bottom: 35px; line-height: 1.6;">Something special is waiting for you...<br>Get ready for an unforgettable Valentine's experience! 💕</p>
-                <button id="ready-btn" style="
-                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                    color: white;
-                    border: none;
-                    padding: 20px 60px;
-                    font-size: 1.4rem;
-                    font-weight: 700;
-                    border-radius: 50px;
-                    cursor: pointer;
-                    box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
-                    transition: all 0.3s ease;
-                    font-family: 'Poppins', sans-serif;
-                ">
-                    I'm Ready! 💖
-                </button>
-            `;
-            
-            overlay.appendChild(promptBox);
-            document.body.appendChild(overlay);
-            
-            // Add click handler to ready button
-            document.getElementById('ready-btn').addEventListener('click', function(e) {
-                e.stopPropagation();
-                
-                // Play audio
                 const playPromise = bgMusic.play();
                 if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
-                            musicToggle.innerHTML = '🔊';
-                            musicPlaying = true;
-                            console.log('✓ Audio started from ready button');
-                        })
-                        .catch(err => {
-                            console.log('Ready button play error:', err?.message || err);
-                        });
-                }
-                
-                // Remove overlay
-                overlay.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => {
-                    overlay.remove();
-                }, 300);
-            });
-        }
-        
-        // Show prompt when page loads
-        window.addEventListener('load', function() {
-            setTimeout(showReadyPrompt, 300);
-        });
-        
-        // **SIMPLE**: Play audio on ANY user interaction
-        function playAudioOnInteraction() {
-            if (bgMusic.paused) {
-                const playPromise = bgMusic.play();
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
-                            musicToggle.innerHTML = '🔊';
-                            musicPlaying = true;
-                            console.log('✓ Audio is playing');
-                        })
-                        .catch(err => {
-                            console.log('Play error:', err?.message || err);
-                        });
+                    playPromise.then(() => {
+                        musicToggle.innerHTML = '🔊';
+                        musicToggle.classList.add('playing');
+                        musicPlaying = true;
+                    }).catch(e => {
+                        console.log('Play failed:', e);
+                    });
                 }
             }
         }
         
-        // Attach to ALL interactions
-        const events = ['touchstart', 'click', 'keydown', 'mousedown'];
-        events.forEach(e => {
-            document.addEventListener(e, playAudioOnInteraction, {passive: true});
+        // Handle visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && musicPlaying) {
+                bgMusic.pause();
+            } else if (!document.hidden && musicPlaying && audioUnlocked) {
+                bgMusic.play().catch(e => {});
+            }
         });
 
         // Create floating hearts background
@@ -1051,7 +1109,6 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const formattedDate = marriageDate.toLocaleDateString('en-US', options);
             
-            // Save marriage date globally for photo frame
             savedMarriageDate = formattedDate;
             
             const messages = [
@@ -1149,10 +1206,8 @@
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
-                    // Set the uploaded image
                     document.getElementById('uploaded-photo').src = e.target.result;
                     
-                    // Get the marriage date from global variable or use default
                     const frameDateElement = document.getElementById('frame-marriage-date');
                     
                     if (savedMarriageDate) {
@@ -1161,15 +1216,12 @@
                         frameDateElement.innerHTML = 'Our Special Day 💕';
                     }
                     
-                    // Hide upload section
                     document.getElementById('upload-section').style.display = 'none';
                     
-                    // Show photo frame with animation
                     const photoFrame = document.getElementById('photo-frame');
                     photoFrame.style.display = 'block';
                     photoFrame.style.animation = 'slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                     
-                    // Confetti celebration!
                     confetti({
                         particleCount: 150,
                         spread: 100,
@@ -1183,6 +1235,16 @@
                 alert('Please upload a valid image file! 📸');
             }
         }
+        
+        // Prevent double-tap zoom on mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
