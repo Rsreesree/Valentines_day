@@ -318,13 +318,10 @@
     <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Background Music (hidden but accessible) -->
-    <!-- Use remote URL first; local file may be blocked on mobile when opened via file:// -->
-    <audio id="bgMusic" loop preload="auto" playsinline style="visibility:hidden;position:absolute;top:0;left:0;width:0;height:0;">
+    <!-- Background Music - FIXED: Removed autoplay -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="audio/Oh My Kadavule - Kadhaippoma Song.mp3" type="audio/mpeg">
         <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
-        <!-- fallback to local copy if necessary -->
-        <source src="audio/Oh%20My%20Kadavule%20-%20Kadhaippoma%20Song.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
     </audio>
     
     <!-- Music Control Button -->
@@ -336,7 +333,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            <p style="font-size:0.9rem;color:#888;margin-top:10px;">Tap anywhere or press "I'm Ready" to start the music 🎶</p>
+            
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -779,26 +776,32 @@
     <script>
         // Music Control Variables
         let musicPlaying = false;
+        let musicStarted = false; // FIXED: Track if music has been started
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('music-toggle');
         
         // Store marriage date globally
         let savedMarriageDate = null;
         
-        // Toggle Music Function
+        // FIXED: Toggle Music Function with mobile support
         function toggleMusic() {
             if (musicPlaying) {
                 bgMusic.pause();
                 musicToggle.innerHTML = '🔇';
                 musicPlaying = false;
             } else {
-                bgMusic.play().catch(e => console.log('Music play failed:', e));
-                musicToggle.innerHTML = '🔊';
-                musicPlaying = true;
+                // FIXED: Use Promise-based handling for mobile
+                bgMusic.play().then(() => {
+                    musicToggle.innerHTML = '🔊';
+                    musicPlaying = true;
+                    musicStarted = true;
+                }).catch(e => {
+                    console.log('Music play failed:', e);
+                });
             }
         }
         
-        // Show "Are You Ready?" Prompt
+        // FIXED: Show "Are You Ready?" Prompt with async music
         function showReadyPrompt() {
             // Preload the music immediately
             bgMusic.load();
@@ -855,22 +858,20 @@
             overlay.appendChild(promptBox);
             document.body.appendChild(overlay);
             
-            // Add click handler to ready button
-            document.getElementById('ready-btn').addEventListener('click', function() {
-                // Start music immediately
-                const playPromise = bgMusic.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        musicToggle.innerHTML = '🔊';
-                        musicPlaying = true;
-                        console.log('Music started successfully!');
-                    }).catch(e => {
-                        console.log('Music play error:', e);
-                    });
+            // FIXED: Click handler with async music
+            document.getElementById('ready-btn').addEventListener('click', async function() {
+                // Try to start music immediately on user interaction
+                try {
+                    await bgMusic.play();
+                    musicToggle.innerHTML = '🔊';
+                    musicPlaying = true;
+                    musicStarted = true;
+                    console.log('Music started successfully on mobile!');
+                } catch (e) {
+                    console.log('Music play blocked:', e);
                 }
                 
-                // Remove overlay immediately (no delay)
+                // Remove overlay
                 overlay.style.animation = 'fadeOut 0.3s ease';
                 setTimeout(() => {
                     overlay.remove();
@@ -878,31 +879,25 @@
             });
         }
         
-        // Show prompt when page loads and preload music
+        // Show prompt when page loads
         window.addEventListener('load', function() {
-            // Preload music in background
             bgMusic.load();
             setTimeout(showReadyPrompt, 300);
+        });
 
-            // also listen for a first touch/click anywhere on the page to kickstart audio on mobile
-            function startAudioOnInteraction() {
-                if (!musicPlaying) {
-                    bgMusic.play().then(() => {
-                        musicToggle.innerHTML = '🔊';
-                        musicPlaying = true;
-                        console.log('Music started on user interaction');
-                    }).catch(e => {
-                        console.log('interaction play failed:', e);
-                        // try again on next touch
-                        document.body.addEventListener('touchstart', startAudioOnInteraction, {once: true});
-                        document.body.addEventListener('click', startAudioOnInteraction, {once: true});
-                    });
+        // FIXED: NEW Fallback - tries to play on any click if not started yet
+        document.addEventListener('click', async function() {
+            if (!musicStarted && bgMusic.paused) {
+                try {
+                    await bgMusic.play();
+                    musicToggle.innerHTML = '🔊';
+                    musicPlaying = true;
+                    musicStarted = true;
+                    console.log('Music started on user interaction');
+                } catch (e) {
+                    // Silent fail - will try again on next click
                 }
-                document.body.removeEventListener('touchstart', startAudioOnInteraction);
-                document.body.removeEventListener('click', startAudioOnInteraction);
             }
-            document.body.addEventListener('touchstart', startAudioOnInteraction, {once: true});
-            document.body.addEventListener('click', startAudioOnInteraction, {once: true});
         });
 
         // Create floating hearts background
