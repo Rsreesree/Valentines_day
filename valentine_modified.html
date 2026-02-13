@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine? 💕</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background Hearts */
+        .heart-bg {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            animation: floatHeart 15s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes floatHeart {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.15; }
+            50% { 
+                transform: translateY(-100vh) rotate(180deg);
+                opacity: 0.15;
+            }
+            90% { opacity: 0; }
+            100% { 
+                transform: translateY(-200vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px 50px;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen {
+            display: none;
+            animation: slideIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .emoji-big {
+            font-size: 6rem;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #yes-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        #yes-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        #no-btn {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        #no-btn:hover {
+            background: #d0d0d0;
+        }
+
+        /* Music Toggle Button */
+        #music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #f5576c;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #music-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
+        }
+
+        #music-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Journey Cards */
+        .journey-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        /* Love Letter */
+        .letter {
+            background: #fff9f0;
+            border: 2px solid #f5576c;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: left;
+            margin: 15px 0;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .letter p {
+            color: #333;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .signature {
+            text-align: right;
+            font-weight: 600;
+            color: #f5576c;
+            margin-top: 20px;
+        }
+
+        /* Quiz */
+        .quiz-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 3px solid #e0e0e0;
+            padding: 15px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .quiz-option:hover {
+            border-color: #f5576c;
+            background: #fff0f3;
+            transform: translateX(10px);
+        }
+
+        /* Final Screen */
+        .final-message {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .final-message h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 30px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .emoji-big {
+                font-size: 4rem;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+            #music-toggle {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Hearts -->
+    <div id="hearts-container"></div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="audio/Oh My Kadavule - Kadhaippoma Song.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Music Control Button -->
+    <button id="music-toggle" onclick="toggleMusic()">🔇</button>
+
+    <div class="container">
+        <!-- LANDING SCREEN -->
+        <div id="screen-start" class="screen active">
+            <h1 id="question-text">Will You Be My Valentine?</h1>
+            <div class="emoji-big" id="main-emoji">💝</div>
+            <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
+            
+            <div class="buttons">
+                <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
+                <button id="no-btn" class="btn" onclick="handleNo()">No</button>
+            </div>
+        </div>
+
+        <!-- CELEBRATION SCREEN -->
+        <div id="screen-celebrate" class="screen">
+            <h1>You Made My Day! 🎉</h1>
+            <div class="emoji-big">🥰</div>
+            <p>I'm the happiest person right now! Let me show you how much you mean to me...</p>
+            <button class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-top: 20px;" onclick="showScreen('screen-journey')">Continue Our Journey ✨</button>
+        </div>
+
+        <!-- JOURNEY SELECTION -->
+        <div id="screen-journey" class="screen">
+            <h1>Our Love Journey 💫</h1>
+            <p>I prepared something special for you. Choose where to start!</p>
+            
+            <div class="journey-cards">
+                <div class="card" onclick="showScreen('screen-marriage')">
+                    <div class="card-icon">💍</div>
+                    <div class="card-title">Marriage Date</div>
+                </div>
+                <div class="card" onclick="showScreen('screen-letter')">
+                    <div class="card-icon">💌</div>
+                    <div class="card-title">Love Letter</div>
+                </div>
+                <div class="card" onclick="showScreen('screen-quiz')">
+                    <div class="card-icon">❤️</div>
+                    <div class="card-title">Love Quiz</div>
+                </div>
+                <div class="card" onclick="showScreen('screen-flames')">
+                    <div class="card-icon">🔥</div>
+                    <div class="card-title">FLAMES</div>
+                </div>
+                <div class="card" onclick="showScreen('screen-final')" style="grid-column: span 2;">
+                    <div class="card-icon">💝</div>
+                    <div class="card-title">Final Surprise</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MARRIAGE DATE SCREEN -->
+        <div id="screen-marriage" class="screen">
+            <h1>Our Marriage Date 💍</h1>
+            <p>Let's find out when you and Sreejith will tie the knot!</p>
+            
+            <div style="margin: 30px 0;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px; text-align: left;">Enter Your Date of Birth:</label>
+                    <input type="date" id="dob-input" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; font-family: 'Poppins', sans-serif;">
+                </div>
+                
+                <button class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; width: 100%;" onclick="calculateMarriageDate()">Find Our Wedding Day! 💕</button>
+            </div>
+            
+            <div id="marriage-result" style="display: none; margin-top: 30px;">
+                <div class="final-message">
+                    <div class="emoji-big" style="font-size: 4rem; margin: 0;">💒</div>
+                    <h2 style="color: #f5576c; font-size: 2rem; margin: 20px 0;">Save The Date!</h2>
+                    <h3 id="marriage-date" style="font-size: 2.5rem; color: #333; margin: 20px 0; font-weight: 700;"></h3>
+                    <p id="marriage-message" style="font-size: 1.1rem;"></p>
+                    <p style="font-weight: 600; color: #333; margin-top: 15px;">Your Age on Wedding Day: <span id="wedding-age" style="color: #f5576c; font-size: 1.3rem;"></span></p>
+                </div>
+                <button class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-top: 20px;" onclick="showScreen('screen-journey')">← Back to Journey</button>
+            </div>
+            
+            <button id="marriage-back-btn" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-top: 30px;" onclick="showScreen('screen-journey')">← Back to Journey</button>
+        </div>
+
+        <!-- LOVE LETTER SCREEN -->
+        <div id="screen-letter" class="screen">
+            <h1>From My Heart 💌</h1>
+            
+            <div class="letter">
+                <p><strong>My Dearest Love,</strong></p>
+                <p>Words can't capture what you mean to me, but I'll try...</p>
+                <p>You are my sunrise on the darkest days, my laughter when the world feels heavy, and my peace when everything else is chaos.</p>
+                <p>Every moment we share becomes a treasured memory. Every smile you give me is a gift I never want to forget.</p>
+                <p>I promise to always cherish you, support your dreams, and be your biggest fan through every season of life.</p>
+                <p>Thank you for choosing me. Thank you for being you.</p>
+                <div class="signature">Forever yours,<br>Your Valentine 💕</div>
+            </div>
+            
+            <button class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;" onclick="showScreen('screen-journey')">← Back to Journey</button>
+        </div>
+
+        <!-- FLAMES SCREEN -->
+        <div id="screen-flames" class="screen">
+            <h1>FLAMES Game 🔥</h1>
+            <p>Let's see what our names reveal about us!</p>
+            
+            <div style="margin: 30px 0;">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; color: #333; margin-bottom: 8px; text-align: left;">Enter Your Name:</label>
+                    <input type="text" id="your-name" placeholder="Your name here..." style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; font-family: 'Poppins', sans-serif;">
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p style="margin: 0; font-weight: 600; color: #333;">Finding your relationship with: <span style="color: #f5576c; font-size: 1.2rem;">Sreejith</span> 💕</p>
+                </div>
+                
+                <button class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; width: 100%;" onclick="calculateFlames()">Find Our Relationship! 💕</button>
+            </div>
+            
+            <div id="flames-result" style="display: none; margin-top: 30px;">
+                <div class="final-message">
+                    <div class="emoji-big" style="font-size: 4rem; margin: 0;">🔥</div>
+                    <h2 id="flames-letter" style="font-size: 3rem; margin: 20px 0;"></h2>
+                    <h3 id="flames-meaning" style="color: #f5576c; font-size: 1.5rem; margin-bottom: 15px;"></h3>
+                    <p id="flames-message"></p>
+                </div>
+            </div>
+            
+            <button class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-top: 20px;" onclick="showScreen('screen-journey')">← Back to Journey</button>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="screen-quiz" class="screen">
+            <h1>Love Quiz 💘</h1>
+            <div id="quiz-container">
+                <!-- Question 1 -->
+                <div id="q1" class="quiz-step">
+                    <div class="quiz-question">What makes our relationship special?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="quizAnswer(1, true)">Everything about it ✨</div>
+                        <div class="quiz-option" onclick="quizAnswer(1, false)">Just the good parts</div>
+                        <div class="quiz-option" onclick="quizAnswer(1, false)">I'm not sure yet</div>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div id="q2" class="quiz-step" style="display: none;">
+                    <div class="quiz-question">Where do you see us in the future?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="quizAnswer(2, true)">Together, always 💕</div>
+                        <div class="quiz-option" onclick="quizAnswer(2, false)">Maybe together</div>
+                        <div class="quiz-option" onclick="quizAnswer(2, false)">Taking it day by day</div>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div id="q3" class="quiz-step" style="display: none;">
+                    <div class="quiz-question">What's the best thing about us?</div>
+                    <div class="quiz-options">
+                        <div class="quiz-option" onclick="quizAnswer(3, true)">How we make each other better 🌟</div>
+                        <div class="quiz-option" onclick="quizAnswer(3, false)">The fun times</div>
+                        <div class="quiz-option" onclick="quizAnswer(3, false)">We look good together</div>
+                    </div>
+                </div>
+
+                <!-- Success -->
+                <div id="quiz-success" style="display: none;">
+                    <div class="emoji-big">🎊</div>
+                    <h2>Perfect Score!</h2>
+                    <p>You know our love so well! That's what makes us perfect together 💕</p>
+                    <button class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-top: 20px;" onclick="showScreen('screen-journey')">← Back to Journey</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL SCREEN -->
+        <div id="screen-final" class="screen">
+            <h1 style="font-size: 1.8rem; white-space: nowrap;">You Are My Everything 💖</h1>
+            
+            <!-- Photo Upload Section -->
+            <div id="upload-section" style="margin: 10px 0;">
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Upload your favorite photo 📸</p>
+                <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                <button class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; padding: 10px 25px; font-size: 0.9rem;" onclick="document.getElementById('photo-upload').click()">
+                    Choose Photo 📷
+                </button>
+            </div>
+            
+            <!-- Photo Frame (hidden initially) -->
+            <div id="photo-frame" style="display: none; margin: 15px auto; max-width: 340px;">
+                <div style="
+                    position: relative;
+                    margin: 0 auto;
+                    background: 
+                        linear-gradient(145deg, 
+                            #1a1410 0%, 
+                            #2d2419 25%, 
+                            #3d3021 50%, 
+                            #2d2419 75%, 
+                            #1a1410 100%);
+                    border-radius: 15px;
+                    padding: 10px;
+                    box-shadow: 
+                        0 15px 40px rgba(0, 0, 0, 0.6),
+                        inset 0 2px 6px rgba(255, 255, 255, 0.15),
+                        inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+                ">
+                    <!-- Outer decorative gold frame -->
+                    <div style="
+                        padding: 18px;
+                        background: 
+                            linear-gradient(135deg, 
+                                #f4e5b5 0%, 
+                                #d4af37 15%, 
+                                #f9e79f 30%, 
+                                #b8941e 50%, 
+                                #d4af37 70%, 
+                                #f4e5b5 85%, 
+                                #d4af37 100%);
+                        border-radius: 12px;
+                        position: relative;
+                        box-shadow: 
+                            inset 0 3px 12px rgba(255, 255, 255, 0.5),
+                            inset 0 -3px 12px rgba(0, 0, 0, 0.4),
+                            0 2px 8px rgba(212, 175, 55, 0.6);
+                        border: 2px solid #e6d5a0;
+                    ">
+                        <!-- Ornate border pattern -->
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background-image: 
+                                repeating-linear-gradient(90deg, 
+                                    transparent, 
+                                    transparent 8px, 
+                                    rgba(255,255,255,0.1) 8px, 
+                                    rgba(255,255,255,0.1) 10px),
+                                repeating-linear-gradient(0deg, 
+                                    transparent, 
+                                    transparent 8px, 
+                                    rgba(0,0,0,0.08) 8px, 
+                                    rgba(0,0,0,0.08) 10px);
+                            border-radius: 12px;
+                            pointer-events: none;
+                        "></div>
+                        
+                        <!-- Inner decorative border -->
+                        <div style="
+                            padding: 4px;
+                            background: linear-gradient(135deg, #8b7355 0%, #c9a961 50%, #8b7355 100%);
+                            border-radius: 10px;
+                            box-shadow: 
+                                inset 0 2px 5px rgba(0, 0, 0, 0.6),
+                                0 1px 2px rgba(255, 255, 255, 0.4);
+                        ">
+                            <!-- Cream mat board -->
+                            <div style="
+                                padding: 16px;
+                                background: 
+                                    radial-gradient(ellipse at center, 
+                                        #fffef9 0%, 
+                                        #f8f6ed 40%, 
+                                        #f0ede0 100%);
+                                border-radius: 8px;
+                                box-shadow: 
+                                    inset 0 0 20px rgba(0, 0, 0, 0.12),
+                                    inset 0 2px 4px rgba(0, 0, 0, 0.08);
+                                position: relative;
+                            ">
+                                <!-- Subtle mat texture -->
+                                <div style="
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background-image: 
+                                        repeating-linear-gradient(45deg, 
+                                            transparent, 
+                                            transparent 3px, 
+                                            rgba(0,0,0,0.015) 3px, 
+                                            rgba(0,0,0,0.015) 6px);
+                                    border-radius: 8px;
+                                    pointer-events: none;
+                                "></div>
+                                
+                                <!-- Photo container -->
+                                <div style="
+                                    position: relative;
+                                    overflow: hidden;
+                                    background: #fff;
+                                    box-shadow: 
+                                        0 4px 15px rgba(0, 0, 0, 0.3),
+                                        inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+                                    border: 2px solid #f5f3e8;
+                                ">
+                                    <img id="uploaded-photo" src="" alt="Our Memory" style="
+                                        width: 100%;
+                                        height: auto;
+                                        display: block;
+                                        max-height: 300px;
+                                        object-fit: cover;
+                                    ">
+                                    
+                                    <!-- Photo overlay for vintage effect -->
+                                    <div style="
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        right: 0;
+                                        bottom: 0;
+                                        background: linear-gradient(to bottom, 
+                                            rgba(255,255,255,0.05) 0%, 
+                                            transparent 20%, 
+                                            transparent 80%, 
+                                            rgba(0,0,0,0.03) 100%);
+                                        pointer-events: none;
+                                    "></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Decorative corner ornaments -->
+                        <div style="position: absolute; top: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
+                        <div style="position: absolute; top: 6px; right: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
+                        <div style="position: absolute; bottom: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
+                        <div style="position: absolute; bottom: 6px; right: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
+                        
+                        <!-- Top center ornament -->
+                        <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); font-size: 1.8rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 12px rgba(255,215,0,0.5);">❖</div>
+                        
+                        <!-- Side ornaments -->
+                        <div style="position: absolute; left: -8px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: #fff9e6; opacity: 0.9; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">◈</div>
+                        <div style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: #fff9e6; opacity: 0.9; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">◈</div>
+                    </div>
+                    
+                    <!-- Elegant engraved nameplate -->
+                    <div style="
+                        margin-top: 12px;
+                        background: 
+                            linear-gradient(145deg, 
+                                #c9a961 0%, 
+                                #f4e5b5 20%, 
+                                #d4af37 50%, 
+                                #f9e79f 80%, 
+                                #c9a961 100%);
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        box-shadow: 
+                            0 4px 12px rgba(0, 0, 0, 0.5),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.7),
+                            inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+                        border: 1.5px solid #b8941e;
+                        text-align: center;
+                        position: relative;
+                    ">
+                        <!-- Nameplate engraving effect -->
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background-image: 
+                                repeating-linear-gradient(90deg, 
+                                    transparent, 
+                                    transparent 1px, 
+                                    rgba(0,0,0,0.03) 1px, 
+                                    rgba(0,0,0,0.03) 2px);
+                            border-radius: 8px;
+                            pointer-events: none;
+                        "></div>
+                        
+                        <div style="
+                            font-family: 'Georgia', serif;
+                            font-weight: 700;
+                            color: #3a2a0a;
+                            font-size: 0.85rem;
+                            letter-spacing: 1.5px;
+                            text-shadow: 
+                                0 1px 2px rgba(255,255,255,0.8),
+                                0 -1px 1px rgba(0,0,0,0.2);
+                            margin-bottom: 4px;
+                            position: relative;
+                        ">Forever & Always</div>
+                        
+                        <!-- Decorative divider -->
+                        <div style="
+                            width: 80%;
+                            height: 1px;
+                            background: linear-gradient(to right, 
+                                transparent, 
+                                rgba(58, 42, 10, 0.3) 50%, 
+                                transparent);
+                            margin: 4px auto;
+                        "></div>
+                        
+                        <div id="frame-marriage-date" style="
+                            font-family: 'Georgia', serif;
+                            font-style: italic;
+                            font-weight: 500;
+                            color: #5a4a2a;
+                            font-size: 0.75rem;
+                            letter-spacing: 0.5px;
+                            text-shadow: 
+                                0 1px 1px rgba(255,255,255,0.6),
+                                0 -1px 1px rgba(0,0,0,0.15);
+                            position: relative;
+                        ">💕</div>
+                    </div>
+                    
+                    <!-- Ornate frame stand -->
+                    <div style="
+                        margin: 8px auto 0 auto;
+                        width: 80px;
+                        height: 6px;
+                        background: linear-gradient(to bottom, 
+                            #4a3a1a 0%, 
+                            #2c2416 50%, 
+                            #1a1410 100%);
+                        border-radius: 0 0 4px 4px;
+                        box-shadow: 
+                            0 3px 6px rgba(0, 0, 0, 0.4),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.1);
+                        position: relative;
+                    ">
+                        <!-- Stand highlight -->
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            left: 10%;
+                            right: 10%;
+                            height: 1px;
+                            background: rgba(255, 255, 255, 0.2);
+                        "></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="final-message" style="margin-top: 10px; padding: 15px;">
+                <h2 style="font-size: 1.3rem; margin-bottom: 8px;">Forever & Always</h2>
+                <p style="font-size: 0.85rem; margin-bottom: 8px;">No matter where life takes us, my heart will always find its way back to you. You're not just my Valentine — you're my today, my tomorrow, and my always.</p>
+                <p style="font-size: 0.85rem; margin-bottom: 0;"><strong>Happy Valentine's Day, my love! 💝</strong></p>
+            </div>
+            
+            <button class="btn" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white; margin-top: 12px; padding: 10px 25px; font-size: 0.95rem;" onclick="location.reload()">Start Over 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // Music Control Variables
+        let musicPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.getElementById('music-toggle');
+        
+        // Store marriage date globally
+        let savedMarriageDate = null;
+        
+        // Toggle Music Function
+        function toggleMusic() {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicToggle.innerHTML = '🔇';
+                musicPlaying = false;
+            } else {
+                bgMusic.play().catch(e => console.log('Music play failed:', e));
+                musicToggle.innerHTML = '🔊';
+                musicPlaying = true;
+            }
+        }
+        
+        // Show "Are You Ready?" Prompt
+        function showReadyPrompt() {
+            // Preload the music immediately
+            bgMusic.load();
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'ready-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 50%, rgba(240, 147, 251, 0.95) 100%);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 99999;
+                animation: fadeIn 0.5s ease;
+            `;
+            
+            const promptBox = document.createElement('div');
+            promptBox.style.cssText = `
+                background: white;
+                padding: 50px 40px;
+                border-radius: 30px;
+                text-align: center;
+                max-width: 450px;
+                width: 90%;
+                box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+                animation: slideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            `;
+            
+            promptBox.innerHTML = `
+                <div style="font-size: 5rem; margin-bottom: 25px; animation: pulse 2s infinite;">💝</div>
+                <h1 style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; margin-bottom: 20px; font-weight: 700;">Are You Ready?</h1>
+                <p style="color: #666; font-size: 1.2rem; margin-bottom: 35px; line-height: 1.6;">Something special is waiting for you...<br>Get ready for an unforgettable Valentine's experience! 💕</p>
+                <button id="ready-btn" style="
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                    border: none;
+                    padding: 20px 60px;
+                    font-size: 1.4rem;
+                    font-weight: 700;
+                    border-radius: 50px;
+                    cursor: pointer;
+                    box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+                    transition: all 0.3s ease;
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    I'm Ready! 💖
+                </button>
+            `;
+            
+            overlay.appendChild(promptBox);
+            document.body.appendChild(overlay);
+            
+            // Add click handler to ready button
+            document.getElementById('ready-btn').addEventListener('click', function() {
+                // Start music immediately
+                const playPromise = bgMusic.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        musicToggle.innerHTML = '🔊';
+                        musicPlaying = true;
+                        console.log('Music started successfully!');
+                    }).catch(e => {
+                        console.log('Music play error:', e);
+                    });
+                }
+                
+                // Remove overlay immediately (no delay)
+                overlay.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            });
+        }
+        
+        // Show prompt when page loads and preload music
+        window.addEventListener('load', function() {
+            // Preload music in background
+            bgMusic.load();
+            setTimeout(showReadyPrompt, 300);
+        });
+
+        // Create floating hearts background
+        function createFloatingHearts() {
+            const container = document.getElementById('hearts-container');
+            const hearts = ['❤️', '💕', '💖', '💗', '💝'];
+            
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-bg';
+                heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 15 + 's';
+                heart.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        createFloatingHearts();
+
+        // Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // No button logic
+        let noCount = 0;
+        let yesScale = 1;
+        const messages = [
+            { text: "Are you absolutely sure about that? 🤔", emoji: "😢", subtext: "Think carefully... this is your chance for something amazing!" },
+            { text: "Really? You're going to say no to me? 💔", emoji: "😭", subtext: "I had so many beautiful plans for us..." },
+            { text: "Come on, don't break my heart like this! 🙏", emoji: "🥹", subtext: "I promise to make you the happiest person alive!" },
+            { text: "This is your last chance to change your mind! 😢", emoji: "💔", subtext: "I'll be really sad if you don't say yes..." },
+            { text: "You have no choice now! 😈", emoji: "🥺", subtext: "The YES button is calling your name!" }
+        ];
+
+        function handleNo() {
+            if (noCount < messages.length) {
+                const msg = messages[noCount];
+                document.getElementById('question-text').innerText = msg.text;
+                document.getElementById('main-emoji').innerText = msg.emoji;
+                document.getElementById('message-text').innerText = msg.subtext;
+                
+                yesScale += 0.3;
+                document.getElementById('yes-btn').style.transform = `scale(${yesScale})`;
+                
+                const noBtn = document.getElementById('no-btn');
+                noBtn.style.transform = `scale(${1 - noCount * 0.15})`;
+                
+                noCount++;
+                
+                if (noCount === messages.length) {
+                    noBtn.innerText = "Fine... Yes 😊";
+                }
+            } else {
+                handleYes();
+            }
+        }
+
+        function handleYes() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#f093fb', '#f5576c', '#667eea']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#f093fb', '#f5576c', '#667eea']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            setTimeout(() => {
+                showScreen('screen-celebrate');
+            }, 1000);
+        }
+
+        // Quiz logic
+        function quizAnswer(qNum, isCorrect) {
+            if (!isCorrect) {
+                const option = event.target;
+                option.style.background = '#ffebee';
+                option.style.borderColor = '#f5576c';
+                setTimeout(() => {
+                    option.style.background = 'white';
+                    option.style.borderColor = '#e0e0e0';
+                }, 500);
+                return;
+            }
+
+            document.getElementById('q' + qNum).style.display = 'none';
+
+            if (qNum === 3) {
+                document.getElementById('quiz-success').style.display = 'block';
+                
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#f093fb', '#f5576c', '#667eea']
+                });
+            } else {
+                document.getElementById('q' + (qNum + 1)).style.display = 'block';
+            }
+        }
+
+        // Marriage Date calculation
+        function calculateMarriageDate() {
+            const dobInput = document.getElementById('dob-input').value;
+            
+            if (!dobInput) {
+                alert('Please enter your date of birth! 💕');
+                return;
+            }
+            
+            const dob = new Date(dobInput);
+            const today = new Date();
+            
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            
+            const marriageDate = new Date();
+            marriageDate.setFullYear(marriageDate.getFullYear() + 5);
+            
+            const weddingAge = age + 5;
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = marriageDate.toLocaleDateString('en-US', options);
+            
+            // Save marriage date globally for photo frame
+            savedMarriageDate = formattedDate;
+            
+            const messages = [
+                `Mark your calendar! This is when you and Sreejith will begin your forever journey together. 💒`,
+                `In exactly 5 years, you'll walk down the aisle with Sreejith. Get ready for the best day of your life! 💐`,
+                `Your wedding day with Sreejith is set! Time to start planning the celebration of a lifetime! 🎊`,
+                `Five years from now, you and Sreejith will say "I do" and start your happily ever after! 👰`,
+                `This magical date is when you and Sreejith will unite as one. True love awaits! 💫`
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            document.getElementById('marriage-date').innerText = formattedDate;
+            document.getElementById('marriage-message').innerText = randomMessage;
+            document.getElementById('wedding-age').innerText = weddingAge + ' years old';
+            document.getElementById('marriage-result').style.display = 'block';
+            document.getElementById('marriage-back-btn').style.display = 'none';
+            
+            confetti({
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#f093fb', '#f5576c', '#667eea', '#FFD700']
+            });
+            
+            document.getElementById('marriage-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // FLAMES calculation
+        function calculateFlames() {
+            const yourName = document.getElementById('your-name').value.trim().toLowerCase().replace(/\s/g, '');
+            const myName = 'sreejith';
+            
+            if (!yourName) {
+                alert('Please enter your name! 💕');
+                return;
+            }
+            
+            let name1 = yourName.split('');
+            let name2 = myName.split('');
+            
+            for (let i = name1.length - 1; i >= 0; i--) {
+                const index = name2.indexOf(name1[i]);
+                if (index !== -1) {
+                    name1.splice(i, 1);
+                    name2.splice(index, 1);
+                }
+            }
+            
+            const totalCount = name1.length + name2.length;
+            
+            const flames = ['L', 'M', 'A'];
+            const meanings = {
+                'L': 'Lovers',
+                'M': 'Marriage',
+                'A': 'Affection'
+            };
+            
+            const messages = {
+                'L': 'True love! You and Sreejith are meant to be together. Your hearts beat as one! This is destiny! 💕',
+                'M': 'Marriage it is! You and Sreejith are destined to walk down the aisle together! Forever and always! 💍',
+                'A': 'Deep affection! There\'s a special connection between you and Sreejith that keeps bringing you together. You\'re soulmates! 💖'
+            };
+            
+            let flamesList = [...flames];
+            let index = 0;
+            
+            while (flamesList.length > 1) {
+                index = (index + totalCount - 1) % flamesList.length;
+                flamesList.splice(index, 1);
+            }
+            
+            const result = flamesList[0];
+            
+            document.getElementById('flames-letter').innerText = result;
+            document.getElementById('flames-meaning').innerText = meanings[result];
+            document.getElementById('flames-message').innerText = messages[result];
+            document.getElementById('flames-result').style.display = 'block';
+            
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#f093fb', '#f5576c', '#667eea']
+            });
+            
+            document.getElementById('flames-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Handle Photo Upload
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    // Set the uploaded image
+                    document.getElementById('uploaded-photo').src = e.target.result;
+                    
+                    // Get the marriage date from global variable or use default
+                    const frameDateElement = document.getElementById('frame-marriage-date');
+                    
+                    if (savedMarriageDate) {
+                        frameDateElement.innerHTML = savedMarriageDate;
+                    } else {
+                        frameDateElement.innerHTML = 'Our Special Day 💕';
+                    }
+                    
+                    // Hide upload section
+                    document.getElementById('upload-section').style.display = 'none';
+                    
+                    // Show photo frame with animation
+                    const photoFrame = document.getElementById('photo-frame');
+                    photoFrame.style.display = 'block';
+                    photoFrame.style.animation = 'slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    
+                    // Confetti celebration!
+                    confetti({
+                        particleCount: 150,
+                        spread: 100,
+                        origin: { y: 0.6 },
+                        colors: ['#f093fb', '#f5576c', '#667eea', '#FFD700']
+                    });
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please upload a valid image file! 📸');
+            }
+        }
+    </script>
+</body>
+</html>
