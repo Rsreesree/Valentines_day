@@ -27,13 +27,13 @@
             touch-action: manipulation;
         }
 
+        /* Animated Background Hearts */
         .heart-bg {
             position: absolute;
             font-size: 2rem;
             opacity: 0.15;
             animation: floatHeart 15s infinite ease-in-out;
             pointer-events: none;
-            will-change: transform;
         }
 
         @keyframes floatHeart {
@@ -66,7 +66,6 @@
         .container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-radius: 30px;
             padding: 60px 50px;
             max-width: 550px;
@@ -117,7 +116,6 @@
             font-size: 6rem;
             margin: 20px 0;
             animation: pulse 2s infinite;
-            will-change: transform;
         }
 
         @keyframes pulse {
@@ -152,7 +150,7 @@
             color: white;
         }
 
-        #yes-btn:hover {
+        #yes-btn:hover, #yes-btn:active {
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(245, 87, 108, 0.4);
         }
@@ -162,10 +160,11 @@
             color: #666;
         }
 
-        #no-btn:hover {
+        #no-btn:hover, #no-btn:active {
             background: #d0d0d0;
         }
 
+        /* Music Toggle Button - Mobile Optimized */
         #music-toggle {
             position: fixed;
             top: 20px;
@@ -187,15 +186,21 @@
             touch-action: manipulation;
         }
 
-        #music-toggle:hover {
+        #music-toggle:hover, #music-toggle:active {
             transform: scale(1.1) rotate(15deg);
             box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
         }
 
-        #music-toggle:active {
-            transform: scale(0.95);
+        #music-toggle.playing {
+            animation: musicPulse 2s infinite;
         }
 
+        @keyframes musicPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Journey Cards */
         .journey-cards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -210,10 +215,10 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
         }
 
-        .card:hover {
+        .card:hover, .card:active {
             transform: translateY(-5px) scale(1.03);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
@@ -229,6 +234,7 @@
             font-size: 0.95rem;
         }
 
+        /* Love Letter */
         .letter {
             background: #fff9f0;
             border: 2px solid #f5576c;
@@ -239,7 +245,6 @@
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
             max-height: 400px;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .letter p {
@@ -255,6 +260,7 @@
             margin-top: 20px;
         }
 
+        /* Quiz */
         .quiz-question {
             font-size: 1.3rem;
             font-weight: 600;
@@ -276,15 +282,16 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 500;
-            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
         }
 
-        .quiz-option:hover {
+        .quiz-option:hover, .quiz-option:active {
             border-color: #f5576c;
             background: #fff0f3;
             transform: translateX(10px);
         }
 
+        /* Final Screen */
         .final-message {
             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             padding: 30px;
@@ -298,6 +305,44 @@
             margin-bottom: 15px;
         }
 
+        /* Mobile Audio Start Overlay */
+        #audio-start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.98) 0%, rgba(118, 75, 162, 0.98) 50%, rgba(240, 147, 251, 0.98) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .start-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
         @media (max-width: 600px) {
             .container {
                 padding: 40px 30px;
@@ -315,19 +360,34 @@
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
+                top: 10px;
+                right: 10px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Floating Background Hearts -->
     <div id="hearts-container"></div>
 
-    <!-- Audio with reliable CDN source -->
-    <audio id="bgMusic" preload="auto" loop playsinline webkit-playsinline="true" x5-playsinline="true">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <!-- Mobile Audio Start Overlay -->
+    <div id="audio-start-overlay">
+        <div class="start-card">
+            <div style="font-size: 5rem; margin-bottom: 25px; animation: pulse 2s infinite;">💝</div>
+            <h1 style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; margin-bottom: 20px; font-weight: 700;">Tap to Begin</h1>
+            <p style="color: #666; font-size: 1.2rem; margin-bottom: 35px; line-height: 1.6;">Experience this with music 🎵<br>Tap anywhere to start!</p>
+            <div style="font-size: 3rem; animation: bounce 1s infinite;">👇</div>
+        </div>
+    </div>
+
+    <!-- Background Music -->
+    <audio id="bgMusic" preload="auto" playsinline webkit-playsinline>
+        <source src="audio/Oh My Kadavule - Kadhaippoma Song.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce23.mp3" type="audio/mpeg">
     </audio>
     
-    <button id="music-toggle" onclick="toggleMusic()">🔇</button>
+    <!-- Music Control Button -->
+    <button id="music-toggle" onclick="toggleMusic()" style="display: none;">🔇</button>
 
     <div class="container">
         <!-- LANDING SCREEN -->
@@ -335,7 +395,7 @@
             <h1 id="question-text">Will You Be My Valentine?</h1>
             <div class="emoji-big" id="main-emoji">💝</div>
             <p id="message-text">Every moment with you feels like magic. I want to create endless memories together. What do you say?</p>
-            <p style="font-size:0.85rem;color:#999;margin-top:8px;">🎵 Tap "I'm Ready" to start with music</p>
+            
             <div class="buttons">
                 <button id="yes-btn" class="btn" onclick="handleYes()">Yes! 💕</button>
                 <button id="no-btn" class="btn" onclick="handleNo()">No</button>
@@ -458,6 +518,7 @@
         <div id="screen-quiz" class="screen">
             <h1>Love Quiz 💘</h1>
             <div id="quiz-container">
+                <!-- Question 1 -->
                 <div id="q1" class="quiz-step">
                     <div class="quiz-question">What makes our relationship special?</div>
                     <div class="quiz-options">
@@ -467,6 +528,7 @@
                     </div>
                 </div>
 
+                <!-- Question 2 -->
                 <div id="q2" class="quiz-step" style="display: none;">
                     <div class="quiz-question">Where do you see us in the future?</div>
                     <div class="quiz-options">
@@ -476,6 +538,7 @@
                     </div>
                 </div>
 
+                <!-- Question 3 -->
                 <div id="q3" class="quiz-step" style="display: none;">
                     <div class="quiz-question">What's the best thing about us?</div>
                     <div class="quiz-options">
@@ -485,6 +548,7 @@
                     </div>
                 </div>
 
+                <!-- Success -->
                 <div id="quiz-success" style="display: none;">
                     <div class="emoji-big">🎊</div>
                     <h2>Perfect Score!</h2>
@@ -498,6 +562,7 @@
         <div id="screen-final" class="screen">
             <h1 style="font-size: 1.8rem; white-space: nowrap;">You Are My Everything 💖</h1>
             
+            <!-- Photo Upload Section -->
             <div id="upload-section" style="margin: 10px 0;">
                 <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Upload your favorite photo 📸</p>
                 <input type="file" id="photo-upload" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
@@ -506,35 +571,256 @@
                 </button>
             </div>
             
+            <!-- Photo Frame (hidden initially) -->
             <div id="photo-frame" style="display: none; margin: 15px auto; max-width: 340px;">
-                <div style="position: relative; margin: 0 auto; background: linear-gradient(145deg, #1a1410 0%, #2d2419 25%, #3d3021 50%, #2d2419 75%, #1a1410 100%); border-radius: 15px; padding: 10px; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 2px 6px rgba(255, 255, 255, 0.15), inset 0 -2px 6px rgba(0, 0, 0, 0.4);">
-                    <div style="padding: 18px; background: linear-gradient(135deg, #f4e5b5 0%, #d4af37 15%, #f9e79f 30%, #b8941e 50%, #d4af37 70%, #f4e5b5 85%, #d4af37 100%); border-radius: 12px; position: relative; box-shadow: inset 0 3px 12px rgba(255, 255, 255, 0.5), inset 0 -3px 12px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(212, 175, 55, 0.6); border: 2px solid #e6d5a0;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 10px), repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(0,0,0,0.08) 8px, rgba(0,0,0,0.08) 10px); border-radius: 12px; pointer-events: none;"></div>
-                        <div style="padding: 4px; background: linear-gradient(135deg, #8b7355 0%, #c9a961 50%, #8b7355 100%); border-radius: 10px; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(255, 255, 255, 0.4);">
-                            <div style="padding: 16px; background: radial-gradient(ellipse at center, #fffef9 0%, #f8f6ed 40%, #f0ede0 100%); border-radius: 8px; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(0, 0, 0, 0.08); position: relative;">
-                                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0,0,0,0.015) 3px, rgba(0,0,0,0.015) 6px); border-radius: 8px; pointer-events: none;"></div>
-                                <div style="position: relative; overflow: hidden; background: #fff; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(0, 0, 0, 0.1); border: 2px solid #f5f3e8;">
-                                    <img id="uploaded-photo" src="" alt="Our Memory" style="width: 100%; height: auto; display: block; max-height: 300px; object-fit: cover;">
-                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.03) 100%); pointer-events: none;"></div>
+                <div style="
+                    position: relative;
+                    margin: 0 auto;
+                    background: 
+                        linear-gradient(145deg, 
+                            #1a1410 0%, 
+                            #2d2419 25%, 
+                            #3d3021 50%, 
+                            #2d2419 75%, 
+                            #1a1410 100%);
+                    border-radius: 15px;
+                    padding: 10px;
+                    box-shadow: 
+                        0 15px 40px rgba(0, 0, 0, 0.6),
+                        inset 0 2px 6px rgba(255, 255, 255, 0.15),
+                        inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+                ">
+                    <!-- Outer decorative gold frame -->
+                    <div style="
+                        padding: 18px;
+                        background: 
+                            linear-gradient(135deg, 
+                                #f4e5b5 0%, 
+                                #d4af37 15%, 
+                                #f9e79f 30%, 
+                                #b8941e 50%, 
+                                #d4af37 70%, 
+                                #f4e5b5 85%, 
+                                #d4af37 100%);
+                        border-radius: 12px;
+                        position: relative;
+                        box-shadow: 
+                            inset 0 3px 12px rgba(255, 255, 255, 0.5),
+                            inset 0 -3px 12px rgba(0, 0, 0, 0.4),
+                            0 2px 8px rgba(212, 175, 55, 0.6);
+                        border: 2px solid #e6d5a0;
+                    ">
+                        <!-- Ornate border pattern -->
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background-image: 
+                                repeating-linear-gradient(90deg, 
+                                    transparent, 
+                                    transparent 8px, 
+                                    rgba(255,255,255,0.1) 8px, 
+                                    rgba(255,255,255,0.1) 10px),
+                                repeating-linear-gradient(0deg, 
+                                    transparent, 
+                                    transparent 8px, 
+                                    rgba(0,0,0,0.08) 8px, 
+                                    rgba(0,0,0,0.08) 10px);
+                            border-radius: 12px;
+                            pointer-events: none;
+                        "></div>
+                        
+                        <!-- Inner decorative border -->
+                        <div style="
+                            padding: 4px;
+                            background: linear-gradient(135deg, #8b7355 0%, #c9a961 50%, #8b7355 100%);
+                            border-radius: 10px;
+                            box-shadow: 
+                                inset 0 2px 5px rgba(0, 0, 0, 0.6),
+                                0 1px 2px rgba(255, 255, 255, 0.4);
+                        ">
+                            <!-- Cream mat board -->
+                            <div style="
+                                padding: 16px;
+                                background: 
+                                    radial-gradient(ellipse at center, 
+                                        #fffef9 0%, 
+                                        #f8f6ed 40%, 
+                                        #f0ede0 100%);
+                                border-radius: 8px;
+                                box-shadow: 
+                                    inset 0 0 20px rgba(0, 0, 0, 0.12),
+                                    inset 0 2px 4px rgba(0, 0, 0, 0.08);
+                                position: relative;
+                            ">
+                                <!-- Subtle mat texture -->
+                                <div style="
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
+                                    right: 0;
+                                    bottom: 0;
+                                    background-image: 
+                                        repeating-linear-gradient(45deg, 
+                                            transparent, 
+                                            transparent 3px, 
+                                            rgba(0,0,0,0.015) 3px, 
+                                            rgba(0,0,0,0.015) 6px);
+                                    border-radius: 8px;
+                                    pointer-events: none;
+                                "></div>
+                                
+                                <!-- Photo container -->
+                                <div style="
+                                    position: relative;
+                                    overflow: hidden;
+                                    background: #fff;
+                                    box-shadow: 
+                                        0 4px 15px rgba(0, 0, 0, 0.3),
+                                        inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+                                    border: 2px solid #f5f3e8;
+                                ">
+                                    <img id="uploaded-photo" src="" alt="Our Memory" style="
+                                        width: 100%;
+                                        height: auto;
+                                        display: block;
+                                        max-height: 300px;
+                                        object-fit: cover;
+                                    ">
+                                    
+                                    <!-- Photo overlay for vintage effect -->
+                                    <div style="
+                                        position: absolute;
+                                        top: 0;
+                                        left: 0;
+                                        right: 0;
+                                        bottom: 0;
+                                        background: linear-gradient(to bottom, 
+                                            rgba(255,255,255,0.05) 0%, 
+                                            transparent 20%, 
+                                            transparent 80%, 
+                                            rgba(0,0,0,0.03) 100%);
+                                        pointer-events: none;
+                                    "></div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Decorative corner ornaments -->
                         <div style="position: absolute; top: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
                         <div style="position: absolute; top: 6px; right: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
                         <div style="position: absolute; bottom: 6px; left: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
                         <div style="position: absolute; bottom: 6px; right: 6px; font-size: 1.5rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.4);">✦</div>
+                        
+                        <!-- Top center ornament -->
                         <div style="position: absolute; top: -8px; left: 50%; transform: translateX(-50%); font-size: 1.8rem; color: #fff9e6; opacity: 0.95; text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 12px rgba(255,215,0,0.5);">❖</div>
+                        
+                        <!-- Side ornaments -->
                         <div style="position: absolute; left: -8px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: #fff9e6; opacity: 0.9; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">◈</div>
                         <div style="position: absolute; right: -8px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: #fff9e6; opacity: 0.9; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">◈</div>
                     </div>
-                    <div style="margin-top: 12px; background: linear-gradient(145deg, #c9a961 0%, #f4e5b5 20%, #d4af37 50%, #f9e79f 80%, #c9a961 100%); padding: 10px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.7), inset 0 -1px 2px rgba(0, 0, 0, 0.4); border: 1.5px solid #b8941e; text-align: center; position: relative;">
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.03) 1px, rgba(0,0,0,0.03) 2px); border-radius: 8px; pointer-events: none;"></div>
-                        <div style="font-family: 'Georgia', serif; font-weight: 700; color: #3a2a0a; font-size: 0.85rem; letter-spacing: 1.5px; text-shadow: 0 1px 2px rgba(255,255,255,0.8), 0 -1px 1px rgba(0,0,0,0.2); margin-bottom: 4px; position: relative;">Forever & Always</div>
-                        <div style="width: 80%; height: 1px; background: linear-gradient(to right, transparent, rgba(58, 42, 10, 0.3) 50%, transparent); margin: 4px auto;"></div>
-                        <div id="frame-marriage-date" style="font-family: 'Georgia', serif; font-style: italic; font-weight: 500; color: #5a4a2a; font-size: 0.75rem; letter-spacing: 0.5px; text-shadow: 0 1px 1px rgba(255,255,255,0.6), 0 -1px 1px rgba(0,0,0,0.15); position: relative;">💕</div>
+                    
+                    <!-- Elegant engraved nameplate -->
+                    <div style="
+                        margin-top: 12px;
+                        background: 
+                            linear-gradient(145deg, 
+                                #c9a961 0%, 
+                                #f4e5b5 20%, 
+                                #d4af37 50%, 
+                                #f9e79f 80%, 
+                                #c9a961 100%);
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        box-shadow: 
+                            0 4px 12px rgba(0, 0, 0, 0.5),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.7),
+                            inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+                        border: 1.5px solid #b8941e;
+                        text-align: center;
+                        position: relative;
+                    ">
+                        <!-- Nameplate engraving effect -->
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background-image: 
+                                repeating-linear-gradient(90deg, 
+                                    transparent, 
+                                    transparent 1px, 
+                                    rgba(0,0,0,0.03) 1px, 
+                                    rgba(0,0,0,0.03) 2px);
+                            border-radius: 8px;
+                            pointer-events: none;
+                        "></div>
+                        
+                        <div style="
+                            font-family: 'Georgia', serif;
+                            font-weight: 700;
+                            color: #3a2a0a;
+                            font-size: 0.85rem;
+                            letter-spacing: 1.5px;
+                            text-shadow: 
+                                0 1px 2px rgba(255,255,255,0.8),
+                                0 -1px 1px rgba(0,0,0,0.2);
+                            margin-bottom: 4px;
+                            position: relative;
+                        ">Forever & Always</div>
+                        
+                        <!-- Decorative divider -->
+                        <div style="
+                            width: 80%;
+                            height: 1px;
+                            background: linear-gradient(to right, 
+                                transparent, 
+                                rgba(58, 42, 10, 0.3) 50%, 
+                                transparent);
+                            margin: 4px auto;
+                        "></div>
+                        
+                        <div id="frame-marriage-date" style="
+                            font-family: 'Georgia', serif;
+                            font-style: italic;
+                            font-weight: 500;
+                            color: #5a4a2a;
+                            font-size: 0.75rem;
+                            letter-spacing: 0.5px;
+                            text-shadow: 
+                                0 1px 1px rgba(255,255,255,0.6),
+                                0 -1px 1px rgba(0,0,0,0.15);
+                            position: relative;
+                        ">💕</div>
                     </div>
-                    <div style="margin: 8px auto 0 auto; width: 80px; height: 6px; background: linear-gradient(to bottom, #4a3a1a 0%, #2c2416 50%, #1a1410 100%); border-radius: 0 0 4px 4px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.1); position: relative;">
-                        <div style="position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: rgba(255, 255, 255, 0.2);"></div>
+                    
+                    <!-- Ornate frame stand -->
+                    <div style="
+                        margin: 8px auto 0 auto;
+                        width: 80px;
+                        height: 6px;
+                        background: linear-gradient(to bottom, 
+                            #4a3a1a 0%, 
+                            #2c2416 50%, 
+                            #1a1410 100%);
+                        border-radius: 0 0 4px 4px;
+                        box-shadow: 
+                            0 3px 6px rgba(0, 0, 0, 0.4),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.1);
+                        position: relative;
+                    ">
+                        <!-- Stand highlight -->
+                        <div style="
+                            position: absolute;
+                            top: 0;
+                            left: 10%;
+                            right: 10%;
+                            height: 1px;
+                            background: rgba(255, 255, 255, 0.2);
+                        "></div>
                     </div>
                 </div>
             </div>
@@ -550,168 +836,108 @@
     </div>
 
     <script>
-        // Audio Control Variables
+        // Music Control Variables
         let musicPlaying = false;
-        let audioContext = null;
         let audioInitialized = false;
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('music-toggle');
+        const audioOverlay = document.getElementById('audio-start-overlay');
         
         // Store marriage date globally
         let savedMarriageDate = null;
         
-        // Initialize Audio Context for iOS
-        function initAudioContext() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (e) {
-                    console.log('AudioContext error:', e);
-                }
-            }
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-        }
-        
-        // Toggle Music Function
-        function toggleMusic() {
-            initAudioContext();
+        // Initialize Audio for Mobile
+        function initAudio() {
+            if (audioInitialized) return;
             
-            if (musicPlaying) {
-                bgMusic.pause();
-                musicToggle.innerHTML = '🔇';
-                musicPlaying = false;
-            } else {
-                playAudio();
-            }
-        }
-        
-        // Play Audio with error handling
-        function playAudio() {
-            initAudioContext();
+            // Set volume
+            bgMusic.volume = 0.7;
             
+            // iOS/Android specific: load and prepare
+            bgMusic.load();
+            
+            // Try to play immediately after user interaction
             const playPromise = bgMusic.play();
             
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    musicToggle.innerHTML = '🔊';
                     musicPlaying = true;
+                    musicToggle.innerHTML = '🔊';
+                    musicToggle.classList.add('playing');
                     audioInitialized = true;
-                    console.log('Audio playing successfully');
+                    console.log('Audio started successfully');
                 }).catch(error => {
-                    console.log('Play failed:', error);
+                    console.log('Audio play failed:', error);
+                    // If autoplay blocked, show manual control
                     musicToggle.innerHTML = '🔇';
                     musicPlaying = false;
-                    
-                    if (error.name === 'NotAllowedError') {
-                        alert('Please tap the screen first, then click the music button! 🎵');
-                    }
+                    audioInitialized = true;
                 });
             }
+            
+            // Show music toggle button
+            musicToggle.style.display = 'flex';
+            
+            // Remove overlay with animation
+            audioOverlay.style.animation = 'fadeOut 0.5s ease';
+            setTimeout(() => {
+                audioOverlay.style.display = 'none';
+            }, 500);
         }
         
-        // Show "Are You Ready?" Prompt with Audio Init
-        function showReadyPrompt() {
-            const overlay = document.createElement('div');
-            overlay.id = 'ready-overlay';
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 50%, rgba(240, 147, 251, 0.95) 100%);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 99999;
-                animation: fadeIn 0.5s ease;
-                touch-action: manipulation;
-            `;
+        // Handle overlay click/tap for mobile
+        audioOverlay.addEventListener('click', initAudio);
+        audioOverlay.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            initAudio();
+        }, {passive: false});
+        
+        // Toggle Music Function
+        function toggleMusic() {
+            if (!audioInitialized) {
+                initAudio();
+                return;
+            }
             
-            const promptBox = document.createElement('div');
-            promptBox.style.cssText = `
-                background: white;
-                padding: 50px 40px;
-                border-radius: 30px;
-                text-align: center;
-                max-width: 450px;
-                width: 90%;
-                box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-                animation: slideUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            `;
-            
-            promptBox.innerHTML = `
-                <div style="font-size: 5rem; margin-bottom: 25px; animation: pulse 2s infinite;">💝</div>
-                <h1 style="background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; margin-bottom: 20px; font-weight: 700;">Are You Ready?</h1>
-                <p style="color: #666; font-size: 1.2rem; margin-bottom: 35px; line-height: 1.6;">Something special is waiting for you...<br>Get ready for an unforgettable Valentine's experience! 💕</p>
-                <button id="ready-btn" style="
-                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                    color: white;
-                    border: none;
-                    padding: 20px 60px;
-                    font-size: 1.4rem;
-                    font-weight: 700;
-                    border-radius: 50px;
-                    cursor: pointer;
-                    box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
-                    transition: all 0.3s ease;
-                    font-family: 'Poppins', sans-serif;
-                    -webkit-appearance: none;
-                    touch-action: manipulation;
-                ">
-                    I'm Ready! 💖
-                </button>
-            `;
-            
-            overlay.appendChild(promptBox);
-            document.body.appendChild(overlay);
-            
-            const readyBtn = document.getElementById('ready-btn');
-            
-            const handleReady = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Initialize audio context first (required for iOS)
-                initAudioContext();
-                
-                // Try to play audio immediately
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicToggle.innerHTML = '🔇';
+                musicToggle.classList.remove('playing');
+                musicPlaying = false;
+            } else {
                 const playPromise = bgMusic.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         musicToggle.innerHTML = '🔊';
+                        musicToggle.classList.add('playing');
                         musicPlaying = true;
-                        audioInitialized = true;
-                        console.log('Audio started from ready button');
-                    }).catch(err => {
-                        console.log('Ready button play error:', err);
-                        // Even if it fails, we remove the overlay so user can toggle manually
+                    }).catch(e => {
+                        console.log('Play failed:', e);
+                        alert('Please tap the screen first to enable audio! 🎵');
                     });
                 }
-                
-                // Remove overlay
-                overlay.style.animation = 'fadeOut 0.3s ease';
-                setTimeout(() => {
-                    overlay.remove();
-                }, 300);
-                
-                // Remove listeners
-                readyBtn.removeEventListener('click', handleReady);
-                readyBtn.removeEventListener('touchstart', handleReady);
-            };
-            
-            // Add both click and touch events for mobile compatibility
-            readyBtn.addEventListener('click', handleReady);
-            readyBtn.addEventListener('touchstart', handleReady, {passive: false});
+            }
         }
         
-        // Show prompt when page loads
-        window.addEventListener('load', function() {
-            // Preload audio
-            bgMusic.load();
-            setTimeout(showReadyPrompt, 500);
+        // Handle visibility change (pause when tab hidden)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && musicPlaying) {
+                bgMusic.pause();
+            } else if (!document.hidden && musicPlaying) {
+                bgMusic.play().catch(e => console.log('Resume failed:', e));
+            }
+        });
+        
+        // iOS specific: handle audio session interruption
+        bgMusic.addEventListener('pause', function() {
+            if (musicPlaying && !document.hidden) {
+                // Check if it was paused by system
+                setTimeout(() => {
+                    if (musicPlaying) {
+                        bgMusic.play().catch(e => {});
+                    }
+                }, 100);
+            }
         });
 
         // Create floating hearts background
@@ -857,6 +1083,7 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const formattedDate = marriageDate.toLocaleDateString('en-US', options);
             
+            // Save marriage date globally for photo frame
             savedMarriageDate = formattedDate;
             
             const messages = [
@@ -954,8 +1181,10 @@
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
+                    // Set the uploaded image
                     document.getElementById('uploaded-photo').src = e.target.result;
                     
+                    // Get the marriage date from global variable or use default
                     const frameDateElement = document.getElementById('frame-marriage-date');
                     
                     if (savedMarriageDate) {
@@ -964,12 +1193,15 @@
                         frameDateElement.innerHTML = 'Our Special Day 💕';
                     }
                     
+                    // Hide upload section
                     document.getElementById('upload-section').style.display = 'none';
                     
+                    // Show photo frame with animation
                     const photoFrame = document.getElementById('photo-frame');
                     photoFrame.style.display = 'block';
                     photoFrame.style.animation = 'slideIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                     
+                    // Confetti celebration!
                     confetti({
                         particleCount: 150,
                         spread: 100,
@@ -983,6 +1215,16 @@
                 alert('Please upload a valid image file! 📸');
             }
         }
+        
+        // Prevent double-tap zoom on mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
